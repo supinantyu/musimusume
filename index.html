@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#172217" />
+  <title>虫娘ローグガーデン</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">PWA Mini Idle Roguelike</p>
+        <h1>虫娘ローグガーデン</h1>
+        <p class="sub">放置で蜜を集め、虫娘を育て、森を探索するミニゲームです。</p>
+      </div>
+      <button id="saveBtn" class="ghost">保存</button>
+    </header>
+
+    <section class="panel resources">
+      <div><span>蜜</span><b id="honey">0</b></div>
+      <div><span>樹液</span><b id="sap">0</b></div>
+      <div><span>花粉</span><b id="pollen">0</b></div>
+    </section>
+
+    <nav class="tabs" aria-label="画面切替">
+      <button class="tab active" data-view="garden">庭</button>
+      <button class="tab" data-view="girls">虫娘</button>
+      <button class="tab" data-view="explore">探索</button>
+      <button class="tab" data-view="log">記録</button>
+    </nav>
+
+    <section id="garden" class="view active">
+      <div class="panel garden">
+        <h2>虫かご庭園</h2>
+        <p id="idleText">時間経過で資源が溜まります。</p>
+        <div class="garden-girls" id="gardenGirls"></div>
+        <button id="collectBtn" class="primary">資源を回収</button>
+      </div>
+    </section>
+
+    <section id="girls" class="view">
+      <div id="girlCards" class="cards"></div>
+    </section>
+
+    <section id="explore" class="view">
+      <div class="panel">
+        <h2>朝露の草むら</h2>
+        <p>虫娘を1人選んで探索します。3択イベントで素材や経験値を持ち帰れます。</p>
+        <label class="selectLabel">探索メンバー</label>
+        <select id="explorerSelect"></select>
+        <button id="startExploreBtn" class="primary">探索開始</button>
+      </div>
+
+      <div id="explorePanel" class="panel hidden">
+        <div class="dungeonTop">
+          <span id="floorText">深度 1 / 5</span>
+          <span id="hpText">HP 10 / 10</span>
+        </div>
+        <h3 id="eventTitle">イベント</h3>
+        <p id="eventText">探索を開始してください。</p>
+        <div id="choices" class="choices"></div>
+      </div>
+    </section>
+
+    <section id="log" class="view">
+      <div class="panel">
+        <h2>冒険記録</h2>
+        <div id="logList" class="logList"></div>
+        <button id="resetBtn" class="danger">データリセット</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
