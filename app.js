@@ -1,371 +1,71 @@
-const SAVE_KEY = "mushimusume_rogue_garden_v1";
-
-const GIRLS = [
-  {
-    id:"butterfly",
-    name:"モンシロチョウ娘",
-    role:"回復・回避",
-    img:"./assets/butterfly.png",
-    desc:"おとなしい白い蝶娘。花蜜集めと回復が得意。",
-    base:{hp:11, atk:2, def:1, luck:4},
-    cost:{honey:14, pollen:8, sap:0}
-  },
-  {
-    id:"beetle",
-    name:"カブトムシ娘",
-    role:"防御・樹液",
-    img:"./assets/beetle.png",
-    desc:"頼れる甲虫娘。打たれ強く、樹液探索に強い。",
-    base:{hp:17, atk:3, def:4, luck:1},
-    cost:{honey:8, pollen:0, sap:14}
-  },
-  {
-    id:"mantis",
-    name:"カマキリ娘",
-    role:"攻撃・会心",
-    img:"./assets/mantis.png",
-    desc:"緑髪短髪のヤンキー風お姉さん。攻撃性能が高い。",
-    base:{hp:13, atk:5, def:1, luck:2},
-    cost:{honey:10, pollen:4, sap:8}
-  }
+const SAVE_KEY="mushimusume_v5_permadeath";
+const HANDS={rock:{label:"グー",icon:"✊",beats:"scissors"},scissors:{label:"チョキ",icon:"✌️",beats:"paper"},paper:{label:"パー",icon:"🖐️",beats:"rock"}};
+const TYPES=[
+{id:"butterfly",species:"モンシロチョウ娘",egg:"🥚",hand:"paper",role:"回復・回避",img:"./butterfly.png",desc:"おとなしい白い蝶娘。花蜜集めと回復が得意。",base:{hp:32,atk:7,def:2,luck:6},skill:{name:"りんぷんヒール",type:"heal",power:14,cost:3,text:"白い鱗粉が舞い、HPを回復した。"}},
+{id:"beetle",species:"カブトムシ娘",egg:"🥚",hand:"paper",role:"防御・樹液",img:"./beetle.png",desc:"頼れる甲虫娘。グー枠追加まで、あえてパー担当。",base:{hp:46,atk:8,def:7,luck:2},skill:{name:"甲殻ガード",type:"guard",power:9,cost:3,text:"甲殻で構えた。次の被ダメージを大きく減らす。"}},
+{id:"mantis",species:"カマキリ娘",egg:"🥚",hand:"scissors",role:"攻撃・会心",img:"./mantis.png",desc:"緑髪短髪のヤンキー風お姉さん。チョキ攻撃が得意。",base:{hp:36,atk:13,def:2,luck:4},skill:{name:"一閃カマ斬り",type:"damage",power:22,cost:3,text:"鋭い鎌の一撃を叩き込んだ。"}}
 ];
-
-let state = load();
-
-function defaultState(){
-  const now = Date.now();
-  return {
-    resources:{honey:20, sap:10, pollen:10},
-    girls:Object.fromEntries(GIRLS.map(g=>[g.id,{level:1, exp:0}])),
-    lastTick:now,
-    log:["ゲーム開始。虫かご庭園に3人の虫娘が集まりました。"],
-    run:null
-  };
-}
-
-function load(){
-  try{
-    const raw = localStorage.getItem(SAVE_KEY);
-    if(!raw) return defaultState();
-    const parsed = JSON.parse(raw);
-    return {...defaultState(), ...parsed};
-  }catch(e){
-    return defaultState();
-  }
-}
-
-function save(){
-  state.lastTick = Date.now();
-  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-  toastLog("保存しました。");
-  render();
-}
-
-function addLog(text){
-  state.log.unshift(text);
-  state.log = state.log.slice(0,60);
-}
-
-function toastLog(text){
-  addLog(text);
-}
-
-function offlineGain(){
-  const now = Date.now();
-  const diffSec = Math.max(0, Math.floor((now - state.lastTick)/1000));
-  if(diffSec < 5) return;
-  const minutes = Math.min(480, diffSec / 60);
-  const gain = {
-    honey: Math.floor(minutes * 1.2),
-    sap: Math.floor(minutes * 0.7),
-    pollen: Math.floor(minutes * 0.9),
-  };
-  state.resources.honey += gain.honey;
-  state.resources.sap += gain.sap;
-  state.resources.pollen += gain.pollen;
-  if(gain.honey+gain.sap+gain.pollen > 0){
-    addLog(`放置報酬：蜜+${gain.honey}、樹液+${gain.sap}、花粉+${gain.pollen}`);
-  }
-  state.lastTick = now;
-}
-
-function statsFor(girlId){
-  const girl = GIRLS.find(g=>g.id===girlId);
-  const lv = state.girls[girlId].level;
-  return {
-    hp: girl.base.hp + (lv-1)*3,
-    atk: girl.base.atk + Math.floor((lv-1)*1.5),
-    def: girl.base.def + Math.floor((lv-1)*1.2),
-    luck: girl.base.luck + Math.floor((lv-1)*0.7)
-  };
-}
-
-function canPay(cost){
-  return Object.entries(cost).every(([k,v]) => state.resources[k] >= v);
-}
-
-function pay(cost){
-  for(const [k,v] of Object.entries(cost)) state.resources[k] -= v;
-}
-
-function levelUp(id){
-  const girl = GIRLS.find(g=>g.id===id);
-  const data = state.girls[id];
-  const cost = Object.fromEntries(Object.entries(girl.cost).map(([k,v])=>[k, Math.floor(v * data.level * 1.35)]));
-  if(!canPay(cost)){
-    addLog(`${girl.name}の育成素材が足りません。`);
-    render(); return;
-  }
-  pay(cost);
-  data.level++;
-  addLog(`${girl.name}がLv.${data.level}になりました。`);
-  render();
-}
-
-function collect(){
-  const gain = {honey:5, sap:3, pollen:4};
-  const bonus = GIRLS.reduce((sum,g)=>sum + state.girls[g.id].level,0);
-  state.resources.honey += gain.honey + bonus;
-  state.resources.sap += gain.sap + Math.floor(bonus/2);
-  state.resources.pollen += gain.pollen + Math.floor(bonus/2);
-  addLog(`手動回収：蜜+${gain.honey+bonus}、樹液+${gain.sap+Math.floor(bonus/2)}、花粉+${gain.pollen+Math.floor(bonus/2)}`);
-  render();
-}
-
-function startRun(){
-  const id = document.getElementById("explorerSelect").value;
-  const st = statsFor(id);
-  state.run = {girlId:id, floor:1, maxFloor:5, hp:st.hp, maxHp:st.hp, rewards:{honey:0,sap:0,pollen:0}};
-  addLog(`${GIRLS.find(g=>g.id===id).name}が探索に出発しました。`);
-  nextEvent();
-}
-
-function nextEvent(){
-  if(!state.run) return;
-  if(state.run.floor > state.run.maxFloor){
-    completeRun();
-    return;
-  }
-  const events = [
-    {
-      title:"花畑を見つけた",
-      text:"甘い香りがする。蜜を集めるか、休むか、奥まで進むか。",
-      choices:[
-        ["蜜を集める",()=>gainReward({honey:8,pollen:2},"蜜を集めました。")],
-        ["少し休む",()=>heal(4,"少し休んでHPを回復しました。")],
-        ["奥へ進む",()=>riskReward({honey:14,pollen:6},3,"奥で多めの素材を見つけました。")]
-      ]
-    },
-    {
-      title:"朽木の道",
-      text:"樹液の匂いがする。足元は少し危ない。",
-      choices:[
-        ["樹液を採る",()=>gainReward({sap:10},"樹液を採りました。")],
-        ["慎重に歩く",()=>advance("慎重に進みました。")],
-        ["強引に割る",()=>battle("朽木ムカデ",5,3,{sap:18})]
-      ]
-    },
-    {
-      title:"敵の気配",
-      text:"草むらが揺れている。戦うか、避けるか。",
-      choices:[
-        ["戦う",()=>battle("草むらアブラムシ群",4,2,{honey:7,pollen:7})],
-        ["回避する",()=>luckCheck("回避成功。静かに通り抜けました。","見つかって少し傷を負いました。",2)],
-        ["威嚇する",()=>battle("縄張りハチ",6,3,{honey:5,sap:5,pollen:5})]
-      ]
-    },
-    {
-      title:"朝露の泉",
-      text:"葉の上にきらめく朝露が溜まっている。",
-      choices:[
-        ["回復する",()=>heal(7,"朝露でHPが回復しました。")],
-        ["花粉を集める",()=>gainReward({pollen:12},"花粉を集めました。")],
-        ["祈る",()=>luckyBlessing()]
-      ]
-    }
-  ];
-  const ev = events[Math.floor(Math.random()*events.length)];
-  renderEvent(ev);
-}
-
-function renderEvent(ev){
-  document.getElementById("explorePanel").classList.remove("hidden");
-  document.getElementById("floorText").textContent = `深度 ${state.run.floor} / ${state.run.maxFloor}`;
-  document.getElementById("hpText").textContent = `HP ${state.run.hp} / ${state.run.maxHp}`;
-  document.getElementById("eventTitle").textContent = ev.title;
-  document.getElementById("eventText").textContent = ev.text;
-  const choices = document.getElementById("choices");
-  choices.innerHTML = "";
-  ev.choices.forEach(([label,fn])=>{
-    const btn = document.createElement("button");
-    btn.textContent = label;
-    btn.onclick = fn;
-    choices.appendChild(btn);
-  });
-}
-
-function advance(msg){
-  addLog(msg);
-  state.run.floor++;
-  nextEvent();
-  render();
-}
-
-function gainReward(obj,msg){
-  for(const [k,v] of Object.entries(obj)) state.run.rewards[k]+=v;
-  advance(msg);
-}
-
-function heal(amount,msg){
-  state.run.hp = Math.min(state.run.maxHp, state.run.hp + amount);
-  advance(msg);
-}
-
-function riskReward(obj,damage,msg){
-  state.run.hp -= damage;
-  for(const [k,v] of Object.entries(obj)) state.run.rewards[k]+=v;
-  if(state.run.hp <= 0) failRun("無理をしすぎて撤退しました。");
-  else advance(`${msg} ただしHP-${damage}`);
-}
-
-function luckCheck(success,fail,damage){
-  const st = statsFor(state.run.girlId);
-  if(Math.random() < Math.min(.75,.32 + st.luck*.08)){
-    advance(success);
-  }else{
-    state.run.hp -= damage;
-    if(state.run.hp <= 0) failRun("逃げ切れず撤退しました。");
-    else advance(`${fail} HP-${damage}`);
-  }
-}
-
-function luckyBlessing(){
-  const roll = Math.random();
-  if(roll < .4) heal(5,"静かな加護でHPが回復しました。");
-  else if(roll < .8) gainReward({honey:5,sap:5,pollen:5},"不思議な素材を得ました。");
-  else riskReward({pollen:18},4,"強い光を浴びて花粉を得ました。");
-}
-
-function battle(enemy, enemyAtk, enemyHp, reward){
-  const st = statsFor(state.run.girlId);
-  let playerHits = Math.max(1, Math.ceil(enemyHp / Math.max(1, st.atk)));
-  let damage = Math.max(1, enemyAtk * playerHits - st.def);
-  if(Math.random() < st.luck * .06){
-    damage = Math.floor(damage/2);
-    addLog("会心の立ち回りで被害を抑えました。");
-  }
-  state.run.hp -= damage;
-  if(state.run.hp <= 0){
-    failRun(`${enemy}との戦闘で撤退しました。`);
-    return;
-  }
-  for(const [k,v] of Object.entries(reward)) state.run.rewards[k]+=v;
-  advance(`${enemy}に勝利。HP-${damage}`);
-}
-
-function completeRun(){
-  for(const [k,v] of Object.entries(state.run.rewards)) state.resources[k]+=v;
-  const girl = GIRLS.find(g=>g.id===state.run.girlId);
-  addLog(`${girl.name}が探索完了。蜜+${state.run.rewards.honey}、樹液+${state.run.rewards.sap}、花粉+${state.run.rewards.pollen}`);
-  state.run = null;
-  document.getElementById("explorePanel").classList.add("hidden");
-  render();
-}
-
-function failRun(msg){
-  addLog(msg + " 持ち帰り素材は半分になりました。");
-  for(const [k,v] of Object.entries(state.run.rewards)){
-    state.resources[k] += Math.floor(v/2);
-  }
-  state.run = null;
-  document.getElementById("explorePanel").classList.add("hidden");
-  render();
-}
-
-function render(){
-  document.getElementById("honey").textContent = state.resources.honey;
-  document.getElementById("sap").textContent = state.resources.sap;
-  document.getElementById("pollen").textContent = state.resources.pollen;
-
-  const gardenGirls = document.getElementById("gardenGirls");
-  gardenGirls.innerHTML = "";
-  GIRLS.forEach(g=>{
-    const d = document.createElement("div");
-    d.className = "gardenSprite";
-    d.innerHTML = `<img src="${g.img}" alt="${g.name}"><span>${g.name} Lv.${state.girls[g.id].level}</span>`;
-    gardenGirls.appendChild(d);
-  });
-
-  const cards = document.getElementById("girlCards");
-  cards.innerHTML = "";
-  GIRLS.forEach(g=>{
-    const lv = state.girls[g.id].level;
-    const st = statsFor(g.id);
-    const cost = Object.fromEntries(Object.entries(g.cost).map(([k,v])=>[k, Math.floor(v * lv * 1.35)]));
-    const card = document.createElement("article");
-    card.className = "card";
-    card.innerHTML = `
-      <img src="${g.img}" alt="${g.name}">
-      <div class="cardTop"><h3>${g.name}</h3><span class="level">Lv.${lv}</span></div>
-      <p class="stats">${g.desc}<br>役割：${g.role}<br>HP ${st.hp} / 攻撃 ${st.atk} / 防御 ${st.def} / 運 ${st.luck}</p>
-      <p class="stats">育成素材：蜜${cost.honey || 0} / 樹液${cost.sap || 0} / 花粉${cost.pollen || 0}</p>
-      <button data-level="${g.id}">育成する</button>
-    `;
-    cards.appendChild(card);
-  });
-  document.querySelectorAll("[data-level]").forEach(btn=>{
-    btn.onclick = () => levelUp(btn.dataset.level);
-  });
-
-  const select = document.getElementById("explorerSelect");
-  select.innerHTML = "";
-  GIRLS.forEach(g=>{
-    const option = document.createElement("option");
-    option.value = g.id;
-    option.textContent = `${g.name} Lv.${state.girls[g.id].level}`;
-    select.appendChild(option);
-  });
-
-  const logList = document.getElementById("logList");
-  logList.innerHTML = "";
-  state.log.forEach(item=>{
-    const div = document.createElement("div");
-    div.className = "logItem";
-    div.textContent = item;
-    logList.appendChild(div);
-  });
-
-  if(state.run){
-    document.getElementById("explorePanel").classList.remove("hidden");
-    document.getElementById("floorText").textContent = `深度 ${state.run.floor} / ${state.run.maxFloor}`;
-    document.getElementById("hpText").textContent = `HP ${state.run.hp} / ${state.run.maxHp}`;
-  }
-  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-}
-
-document.querySelectorAll(".tab").forEach(tab=>{
-  tab.onclick = () => {
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-    tab.classList.add("active");
-    document.getElementById(tab.dataset.view).classList.add("active");
-  };
-});
-
-document.getElementById("collectBtn").onclick = collect;
-document.getElementById("saveBtn").onclick = save;
-document.getElementById("startExploreBtn").onclick = startRun;
-document.getElementById("resetBtn").onclick = () => {
-  if(confirm("セーブデータをリセットしますか？")){
-    localStorage.removeItem(SAVE_KEY);
-    state = defaultState();
-    render();
-  }
-};
-
-offlineGain();
-render();
-
-if("serviceWorker" in navigator){
-  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
-}
+const ENEMIES=[
+{id:"aphid",name:"アブラムシ群",icon:"●",hand:"rock",hp:24,atk:5,def:0,reward:{honey:9,pollen:7,sap:0},exp:5,text:"小さな敵が群れでまとわりつく。"},
+{id:"wasp",name:"縄張りハチ",icon:"◆",hand:"scissors",hp:30,atk:8,def:1,reward:{honey:7,pollen:5,sap:4},exp:7,text:"鋭い羽音が近づいてくる。"},
+{id:"centipede",name:"朽木ムカデ",icon:"〽",hand:"rock",hp:38,atk:9,def:2,reward:{honey:2,pollen:0,sap:15},exp:9,text:"朽木の隙間から危険な影が這い出した。"},
+{id:"spider",name:"網張りグモ",icon:"✦",hand:"paper",hp:34,atk:7,def:3,reward:{honey:4,pollen:12,sap:5},exp:8,text:"粘る糸が行く手をふさいでいる。"}
+];
+const RELIC_POOL=[
+{id:"stag_pincer",name:"クワガタのハサミ",icon:"🪲",rarity:"R",hand:"scissors",effect:{atk:5,crit:.06},desc:"チョキ攻撃の威力+5。会心率も少し上がる。"},
+{id:"wasp_stinger",name:"スズメバチの針",icon:"◆",rarity:"R",hand:"scissors",effect:{atk:4,pierce:2},desc:"チョキ攻撃の威力+4。敵防御を少し貫通する。"},
+{id:"cockroach_antenna",name:"ゴキブリの触覚",icon:"⌁",rarity:"N",hand:"paper",effect:{luck:4,evade:.06},desc:"パー攻撃時、運+4。被弾回避も少し上がる。"},
+{id:"beetle_shell",name:"カナブンの甲殻",icon:"◒",rarity:"N",hand:"rock",effect:{atk:2,guard:3},desc:"グー攻撃の威力+2。防御時の軽減量+3。"},
+{id:"cicada_shell",name:"セミの抜け殻",icon:"◇",rarity:"SR",hand:"paper",effect:{atk:3,heal:3},desc:"パー攻撃の威力+3。攻撃後にHPを少し回復する。"},
+{id:"dragonfly_wing",name:"トンボの透明翅",icon:"∴",rarity:"R",hand:"paper",effect:{atk:2,evade:.10},desc:"パー攻撃の威力+2。回避率が上がる。"},
+{id:"ant_jaw",name:"アリの大顎",icon:"⌒",rarity:"N",hand:"rock",effect:{atk:4},desc:"グー攻撃の威力+4。"},
+{id:"mantis_foreleg",name:"古い鎌脚",icon:"⌐",rarity:"SR",hand:"scissors",effect:{atk:7,crit:.04},desc:"チョキ攻撃の威力+7。"},
+{id:"moth_powder",name:"蛾の夜鱗粉",icon:"✧",rarity:"R",hand:"paper",effect:{atk:2,debuff:2},desc:"パー攻撃の威力+2。敵の次の攻撃を少し弱める。"}
+];
+let pendingType=null;let state=load();
+function defaultState(){return{resources:{honey:25,sap:12,pollen:12},active:null,relics:[],equipped:{rock:null,scissors:null,paper:null},best:{level:0,depth:0,wins:0,name:""},graves:[],lastTick:Date.now(),log:["卵を選んで挑戦を開始してください。"],run:null,battle:null}}
+function load(){try{let raw=localStorage.getItem(SAVE_KEY);return raw?{...defaultState(),...JSON.parse(raw)}:defaultState()}catch(e){return defaultState()}}
+function save(){state.lastTick=Date.now();localStorage.setItem(SAVE_KEY,JSON.stringify(state));addLog("保存しました。");render()}
+function addLog(t){state.log.unshift(t);state.log=state.log.slice(0,100)}
+function handLabel(h){return`${HANDS[h].icon} ${HANDS[h].label}`}function resultVs(a,b){return a===b?"draw":HANDS[a].beats===b?"win":"lose"}
+function typeDef(id){return TYPES.find(t=>t.id===id)}function activeType(){return state.active?typeDef(state.active.typeId):null}function rb(uid){return state.relics.find(r=>r.uid===uid)}function eq(hand){let uid=state.equipped[hand];return uid?rb(uid):null}
+function stats(){let t=activeType(),lv=state.active.level;return{hp:t.base.hp+(lv-1)*6,atk:t.base.atk+Math.floor((lv-1)*2.2),def:t.base.def+Math.floor((lv-1)*1.5),luck:t.base.luck+Math.floor((lv-1)*.8),maxSp:6+Math.floor(lv/2)}}
+function offlineGain(){let now=Date.now(),diff=Math.max(0,Math.floor((now-state.lastTick)/1000));if(diff<5)return;let m=Math.min(480,diff/60),gain={honey:Math.floor(m*1.2),sap:Math.floor(m*.7),pollen:Math.floor(m*.9)};state.resources.honey+=gain.honey;state.resources.sap+=gain.sap;state.resources.pollen+=gain.pollen;if(gain.honey+gain.sap+gain.pollen>0)addLog(`放置報酬：蜜+${gain.honey}、樹液+${gain.sap}、花粉+${gain.pollen}`);state.lastTick=now}
+function selectEgg(id){pendingType=id;let t=typeDef(id);document.getElementById("eggScreen").classList.add("hidden");document.getElementById("nameScreen").classList.remove("hidden");document.getElementById("nameTitle").textContent=`${t.species}が孵りました`;document.getElementById("namePreview").src=t.img;document.getElementById("nameInput").value=t.species}
+function confirmName(){if(!pendingType)return;let t=typeDef(pendingType);let name=document.getElementById("nameInput").value.trim()||t.species;let st={typeId:t.id,name,level:1,exp:0,wins:0,maxDepth:0,bornAt:Date.now()};state.active=st;state.relics=[];state.equipped={rock:null,scissors:null,paper:null};state.run=null;state.battle=null;addLog(`${name}が孵化しました。`);pendingType=null;render()}
+function collect(){if(!state.active)return;let bonus=state.active.level;state.resources.honey+=5+bonus;state.resources.sap+=3+Math.floor(bonus/2);state.resources.pollen+=4+Math.floor(bonus/2);addLog(`手動回収：蜜+${5+bonus}、樹液+${3+Math.floor(bonus/2)}、花粉+${4+Math.floor(bonus/2)}`);render()}
+function levelCost(){let lv=state.active.level;return{honey:Math.floor(14*lv*1.25),sap:Math.floor(8*lv*1.25),pollen:Math.floor(8*lv*1.25)}}
+function levelUp(){let c=levelCost();if(Object.entries(c).some(([k,v])=>state.resources[k]<v)){addLog("育成素材が足りません。");render();return}for(let[k,v]of Object.entries(c))state.resources[k]-=v;state.active.level++;addLog(`${state.active.name}がLv.${state.active.level}になりました。`);updateBest();render()}
+function rollRelic(src="探索"){let weights=RELIC_POOL.map(r=>r.rarity==="SR"?1:r.rarity==="R"?2.3:4),sum=weights.reduce((a,b)=>a+b,0),roll=Math.random()*sum,p=RELIC_POOL[0];for(let i=0;i<RELIC_POOL.length;i++){roll-=weights[i];if(roll<=0){p=RELIC_POOL[i];break}}let relic={...p,uid:`${p.id}_${Date.now()}_${Math.floor(Math.random()*99999)}`};state.relics.push(relic);addLog(`${src}で形見「${relic.name}」を入手しました。`)}
+function equipRelic(uid,hand){let r=rb(uid);if(!r)return;state.equipped[hand]=uid;addLog(`「${r.name}」を${handLabel(hand)}に装備しました。`);render()}function unequip(hand){let r=eq(hand);state.equipped[hand]=null;if(r)addLog(`「${r.name}」を外しました。`);render()}
+function startRun(){if(!state.active)return;if(state.battle){addLog("戦闘中です。");render();return}let st=stats();state.run={floor:1,maxFloor:5,hp:st.hp,maxHp:st.hp,sp:st.maxSp,maxSp:st.maxSp,rewards:{honey:0,sap:0,pollen:0},exp:0};addLog(`${state.active.name}が探索に出発しました。`);document.getElementById("explorePanel").classList.remove("hidden");nextEvent()}
+function nextEvent(){if(!state.run||state.battle)return;if(state.run.floor>state.run.maxFloor){completeRun();return}state.active.maxDepth=Math.max(state.active.maxDepth,state.run.floor);updateBest();let events=[{title:"花畑を見つけた",text:"甘い香りがする。",choices:[["蜜を集める",()=>gainReward({honey:9,pollen:3},"蜜を集めました。")],["少し休む",()=>healRun(8,"少し休みました。")],["奥へ進む",()=>Math.random()<.35?startBattle(randomEnemyId()):gainReward({honey:14,pollen:6},"花の奥で素材を見つけました。")]]},{title:"朽木の道",text:"樹液と古い形見の気配がする。",choices:[["樹液を採る",()=>gainReward({sap:11},"樹液を採りました。")],["形見を探す",()=>eventRelicChance(.55)],["朽木を調べる",()=>startBattle("centipede")]]},{title:"敵の気配",text:"草むらが揺れている。",choices:[["戦う",()=>startBattle(randomEnemyId())],["回避する",()=>luckCheck("回避成功。","見つかって傷を負いました。",5)],["挑発する",()=>startBattle("wasp")]]},{title:"抜け殻の小径",text:"古い抜け殻や翅の欠片が落ちている。",choices:[["丁寧に探す",()=>eventRelicChance(.75)],["急いで進む",()=>advance("急いで先へ進みました。")],["物音の方へ行く",()=>startBattle(randomEnemyId())]]}];renderEvent(events[Math.floor(Math.random()*events.length)])}
+function renderEvent(ev){hideBattle();document.getElementById("explorePanel").classList.remove("hidden");document.getElementById("floorText").textContent=`深度 ${state.run.floor} / ${state.run.maxFloor}`;document.getElementById("hpText").textContent=`HP ${state.run.hp}/${state.run.maxHp}　SP ${state.run.sp}/${state.run.maxSp}`;document.getElementById("eventTitle").textContent=ev.title;document.getElementById("eventText").textContent=ev.text;let c=document.getElementById("choices");c.innerHTML="";ev.choices.forEach(([label,fn])=>{let b=document.createElement("button");b.textContent=label;b.onclick=fn;c.appendChild(b)})}
+function advance(msg){addLog(msg);state.run.floor++;nextEvent();render()}function gainReward(o,msg){for(let[k,v]of Object.entries(o))state.run.rewards[k]+=v;advance(msg)}function healRun(a,msg){state.run.hp=Math.min(state.run.maxHp,state.run.hp+a);advance(msg)}function eventRelicChance(ch){if(Math.random()<ch){rollRelic("イベント");advance("形見を見つけました。")}else advance("何も見つかりませんでした。")}
+function luckCheck(s,f,d){let st=stats();if(Math.random()<Math.min(.78,.3+st.luck*.07))advance(s);else{state.run.hp-=d;if(state.run.hp<=0)permaDeath(f);else advance(`${f} HP-${d}`)}}
+function randomEnemyId(){return ENEMIES[Math.floor(Math.random()*ENEMIES.length)].id}function enemyDef(id){return ENEMIES.find(e=>e.id===id)}
+function scaledEnemy(id){let e=enemyDef(id),f=state.run?.floor||1;return{...e,maxHp:e.hp+(f-1)*5,hp:e.hp+(f-1)*5,atk:e.atk+Math.floor((f-1)*1.5),def:e.def+Math.floor((f-1)*.7)}}
+function startBattle(id){let enemy=scaledEnemy(id);state.battle={enemy,playerGuard:0,enemyWeak:0,text:`${enemy.name}が現れた。${enemy.text}`};document.getElementById("explorePanel").classList.add("hidden");document.getElementById("battlePanel").classList.remove("hidden");renderBattle();render()}
+function handAttack(hand){let t=activeType(),st=stats(),b=state.battle,e=b.enemy,relic=eq(hand),eff=relic?.effect||{},vs=resultVs(hand,e.hand);let dmg=st.atk+(Math.floor(Math.random()*5)-2);if(hand===t.hand)dmg=Math.floor(dmg*1.35)+3;if(vs==="win")dmg=Math.floor(dmg*1.55)+2;if(vs==="lose")dmg=Math.floor(dmg*.65);dmg+=eff.atk||0;dmg=Math.max(1,dmg-Math.max(0,e.def-(eff.pierce||0)));let crit=Math.random()<st.luck*.025+(eff.crit||0);if(crit)dmg=Math.floor(dmg*1.7);b.enemy.hp-=dmg;let parts=[`${handLabel(hand)}攻撃。`];if(hand===t.hand)parts.push("得意手。");if(vs==="win")parts.push("じゃんけん有利。");if(vs==="lose")parts.push("じゃんけん不利。");if(relic)parts.push(`形見「${relic.name}」。`);if(crit)parts.push("会心。");parts.push(`${e.name}に${dmg}ダメージ。`);b.text=parts.join(" ");if(eff.heal){state.run.hp=Math.min(state.run.maxHp,state.run.hp+eff.heal);b.text+=` HP+${eff.heal}。`}if(eff.debuff){b.enemyWeak=Math.max(b.enemyWeak,eff.debuff);b.text+=" 敵の攻撃力が少し落ちた。"}afterPlayerAction()}
+function playerDefend(){let st=stats(),rock=eq("rock");state.battle.playerGuard=8+Math.floor(st.def*1.5)+(rock?.effect?.guard||0);state.battle.text="身を守った。";afterPlayerAction()}
+function playerSkill(){let t=activeType(),st=stats(),b=state.battle,sk=t.skill;if(state.run.sp<sk.cost)return;state.run.sp-=sk.cost;if(sk.type==="heal"){let a=sk.power+Math.floor(st.luck/2);state.run.hp=Math.min(state.run.maxHp,state.run.hp+a);b.text=`${sk.text} HP+${a}`}else if(sk.type==="guard"){b.playerGuard=sk.power+st.def;b.text=sk.text}else{let d=Math.max(1,sk.power+Math.floor(st.atk*.8)-b.enemy.def);b.enemy.hp-=d;b.text=`${sk.text} ${b.enemy.name}に${d}ダメージ。`}afterPlayerAction()}
+function afterPlayerAction(){if(state.battle.enemy.hp<=0){winBattle();return}enemyTurn()}
+function enemyTurn(){let b=state.battle,st=stats(),e=b.enemy,t=activeType(),vs=resultVs(e.hand,t.hand),evade=Object.values(state.equipped).map(uid=>rb(uid)).filter(Boolean).reduce((s,r)=>s+(r.effect.evade||0),0);if(Math.random()<Math.min(.35,st.luck*.012+evade)){b.text+=` ${e.name}の攻撃を回避した。`;b.playerGuard=0;renderBattle();render();return}let atk=e.atk-(b.enemyWeak||0);if(vs==="win")atk=Math.floor(atk*1.35)+1;if(vs==="lose")atk=Math.floor(atk*.75);let dmg=Math.max(1,atk-st.def-b.playerGuard);b.text+=` ${e.name}の${handLabel(e.hand)}攻撃。`;if(vs==="win")b.text+=" 敵有利。";if(vs==="lose")b.text+=" 敵不利。";b.text+=` ${dmg}ダメージ。`;state.run.hp-=dmg;b.playerGuard=0;b.enemyWeak=0;if(state.run.hp<=0){permaDeath(`${e.name}との戦闘に敗北しました。`);return}renderBattle();render()}
+function playerEscape(){let st=stats();if(Math.random()<Math.min(.7,.28+st.luck*.07)){addLog("逃走成功。");state.battle=null;state.run.floor++;nextEvent()}else{state.battle.text="逃げそこねた。";enemyTurn()}}
+function winBattle(){let b=state.battle;for(let[k,v]of Object.entries(b.enemy.reward))state.run.rewards[k]+=v;state.run.exp+=b.enemy.exp;state.active.wins++;addLog(`${b.enemy.name}に勝利。経験値+${b.enemy.exp}。`);if(Math.random()<.38+Math.min(.18,state.run.floor*.03))rollRelic("戦闘後");state.battle=null;state.run.floor++;maybeAutoLevelByExp();updateBest();nextEvent();render()}
+function maybeAutoLevelByExp(){let need=12+state.active.level*5;if(state.run.exp>=need){state.run.exp-=need;state.active.level++;let st=stats();state.run.maxHp=st.hp;state.run.hp=Math.min(st.hp,state.run.hp+12);state.run.maxSp=st.maxSp;state.run.sp=Math.min(st.maxSp,state.run.sp+2);addLog(`${state.active.name}が探索経験でLv.${state.active.level}になりました。`)}}
+function completeRun(){for(let[k,v]of Object.entries(state.run.rewards))state.resources[k]+=v;addLog(`${state.active.name}が探索完了。蜜+${state.run.rewards.honey}、樹液+${state.run.rewards.sap}、花粉+${state.run.rewards.pollen}`);state.run=null;state.battle=null;hideExplore();render()}
+function permaDeath(reason){let a=state.active,t=activeType();state.graves.unshift({name:a.name,species:t.species,level:a.level,depth:a.maxDepth,wins:a.wins,reason,date:new Date().toLocaleString("ja-JP")});state.graves=state.graves.slice(0,30);addLog(`${a.name}はロストしました。${reason}`);state.active=null;state.relics=[];state.equipped={rock:null,scissors:null,paper:null};state.run=null;state.battle=null;hideExplore();render()}
+function retire(){if(!state.active)return;if(confirm(`${state.active.name}を引退させて卵選択に戻りますか？`)){permaDeath("引退しました。")}}
+function updateBest(){if(!state.active)return;let b=state.best,a=state.active;if(a.level>b.level||a.maxDepth>b.depth||a.wins>b.wins)state.best={level:Math.max(b.level,a.level),depth:Math.max(b.depth,a.maxDepth),wins:Math.max(b.wins,a.wins),name:a.name}}
+function hideBattle(){document.getElementById("battlePanel").classList.add("hidden")}function hideExplore(){document.getElementById("explorePanel").classList.add("hidden");hideBattle()}
+function renderBattle(){if(!state.battle||!state.run)return;let b=state.battle,t=activeType();document.getElementById("playerImg").src=t.img;document.getElementById("playerName").textContent=`${state.active.name} Lv.${state.active.level} / 得意 ${handLabel(t.hand)}`;document.getElementById("enemySprite").textContent=b.enemy.icon;document.getElementById("enemyName").textContent=b.enemy.name;document.getElementById("enemyHandText").textContent=`得意手：${handLabel(b.enemy.hand)}`;document.getElementById("playerHpText").textContent=`HP ${state.run.hp}/${state.run.maxHp}　SP ${state.run.sp}/${state.run.maxSp}`;document.getElementById("enemyHpText").textContent=`HP ${b.enemy.hp}/${b.enemy.maxHp}`;document.getElementById("playerHpBar").style.width=`${Math.max(0,state.run.hp/state.run.maxHp*100)}%`;document.getElementById("enemyHpBar").style.width=`${Math.max(0,b.enemy.hp/b.enemy.maxHp*100)}%`;document.getElementById("battleText").textContent=b.text;let actions=document.getElementById("battleActions");actions.innerHTML="";[[`${handLabel("rock")}攻撃`,()=>handAttack("rock")],[`${handLabel("scissors")}攻撃`,()=>handAttack("scissors")],[`${handLabel("paper")}攻撃`,()=>handAttack("paper")],["防御する",playerDefend],[`スキル：${t.skill.name}（SP${t.skill.cost}）`,playerSkill],["逃げる",playerEscape]].forEach(([label,fn])=>{let btn=document.createElement("button");btn.textContent=label;btn.onclick=fn;if(label.startsWith("スキル")&&state.run.sp<t.skill.cost)btn.disabled=true;actions.appendChild(btn)})}
+function render(){document.getElementById("honey").textContent=state.resources.honey;document.getElementById("sap").textContent=state.resources.sap;document.getElementById("pollen").textContent=state.resources.pollen;document.getElementById("eggScreen").classList.toggle("hidden",!!state.active||!!pendingType);document.getElementById("nameScreen").classList.toggle("hidden",!pendingType);document.getElementById("gameUI").classList.toggle("hidden",!state.active);renderEggs();if(state.active){renderActive();renderGirl();renderRelics();renderRecord();if(state.battle)renderBattle()}localStorage.setItem(SAVE_KEY,JSON.stringify(state))}
+function renderEggs(){let box=document.getElementById("eggCards");box.innerHTML="";TYPES.forEach(t=>{let card=document.createElement("article");card.className="card eggCard";card.innerHTML=`<div class="eggIcon">🥚</div><h3>${t.species}の卵</h3><p class="eggType">得意手：${handLabel(t.hand)}</p><p class="stats">${t.desc}</p><button data-egg="${t.id}">この卵を選ぶ</button>`;box.appendChild(card)});document.querySelectorAll("[data-egg]").forEach(b=>b.onclick=()=>selectEgg(b.dataset.egg))}
+function renderActive(){let t=activeType(),st=stats();document.getElementById("runSummary").textContent=`${state.active.name} / ${t.species} / Lv.${state.active.level} / 最高深度 ${state.active.maxDepth} / 勝利 ${state.active.wins}`;document.getElementById("activeGirlBox").innerHTML=`<img src="${t.img}" alt="${state.active.name}"><div><h3>${state.active.name}</h3><p><span class="handBadge">得意手：${handLabel(t.hand)}</span></p><p class="stats">${t.desc}<br>HP ${st.hp} / 攻撃 ${st.atk} / 防御 ${st.def} / 運 ${st.luck} / SP ${st.maxSp}</p></div>`}
+function renderGirl(){let t=activeType(),st=stats(),c=levelCost();document.getElementById("girlCard").innerHTML=`<article class="card"><img src="${t.img}" alt="${state.active.name}"><div class="cardTop"><h3>${state.active.name}</h3><span class="level">Lv.${state.active.level}</span></div><p><span class="handBadge">${t.species} / 得意手：${handLabel(t.hand)}</span></p><p class="stats">HP ${st.hp} / 攻撃 ${st.atk} / 防御 ${st.def} / 運 ${st.luck} / SP ${st.maxSp}<br>スキル：${t.skill.name}<br>育成素材：蜜${c.honey} / 樹液${c.sap} / 花粉${c.pollen}</p><button onclick="levelUp()">育成する</button></article>`}
+function renderRelics(){let slots=document.getElementById("equipSlots");slots.innerHTML="";["rock","scissors","paper"].forEach(hand=>{let r=eq(hand),div=document.createElement("div");div.className="slot";div.innerHTML=`<h3>${handLabel(hand)}スロット</h3><p>${r?`${r.icon} ${r.name}`:"未装備"}</p><p>${r?r.desc:"この手の攻撃に形見効果を乗せられます。"}</p>${r?`<button data-unequip="${hand}">外す</button>`:""}`;slots.appendChild(div)});document.querySelectorAll("[data-unequip]").forEach(btn=>btn.onclick=()=>unequip(btn.dataset.unequip));let list=document.getElementById("relicList");list.innerHTML="";if(state.relics.length===0){let empty=document.createElement("div");empty.className="panel";empty.innerHTML="<h3>形見なし</h3><p>探索イベントや戦闘後にランダムで入手できます。</p>";list.appendChild(empty);return}state.relics.slice().reverse().forEach(r=>{let equipped=Object.values(state.equipped).includes(r.uid),card=document.createElement("article");card.className="card relicCard"+(equipped?" equipped":"");card.innerHTML=`<div class="relicIcon">${r.icon}</div><div class="cardTop"><h3>${r.name}</h3><span class="rarity">${r.rarity}</span></div><p><span class="handBadge">推奨：${handLabel(r.hand)}</span></p><p class="stats">${r.desc}</p><div class="smallBtns"><button data-equip="${r.uid}" data-hand="rock">グーへ</button><button data-equip="${r.uid}" data-hand="scissors">チョキへ</button><button data-equip="${r.uid}" data-hand="paper">パーへ</button></div>`;list.appendChild(card)});document.querySelectorAll("[data-equip]").forEach(btn=>btn.onclick=()=>equipRelic(btn.dataset.equip,btn.dataset.hand))}
+function renderRecord(){document.getElementById("bestRecord").textContent=`最高Lv ${state.best.level} / 最高深度 ${state.best.depth} / 最大勝利数 ${state.best.wins} / 記録保持者 ${state.best.name||"なし"}`;let grave=document.getElementById("graveList");grave.innerHTML="";if(state.graves.length===0){grave.innerHTML='<div class="logItem">まだ墓標はありません。</div>'}else state.graves.forEach(g=>{let d=document.createElement("div");d.className="logItem";d.textContent=`${g.name}（${g.species}） Lv.${g.level} / 深度${g.depth} / 勝利${g.wins} / ${g.reason} / ${g.date}`;grave.appendChild(d)});let log=document.getElementById("logList");log.innerHTML="";state.log.forEach(item=>{let div=document.createElement("div");div.className="logItem";div.textContent=item;log.appendChild(div)})}
+document.querySelectorAll(".tab").forEach(tab=>{tab.onclick=()=>{document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));tab.classList.add("active");document.getElementById(tab.dataset.view).classList.add("active")}});
+document.getElementById("collectBtn").onclick=collect;document.getElementById("saveBtn").onclick=save;document.getElementById("startExploreBtn").onclick=startRun;document.getElementById("confirmNameBtn").onclick=confirmName;document.getElementById("retireBtn").onclick=retire;document.getElementById("resetBtn").onclick=()=>{if(confirm("全データをリセットしますか？")){localStorage.removeItem(SAVE_KEY);pendingType=null;state=defaultState();render()}};
+offlineGain();render();if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));

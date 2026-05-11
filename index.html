@@ -12,9 +12,9 @@
   <main class="app">
     <header class="hero">
       <div>
-        <p class="eyebrow">PWA Mini Idle Roguelike</p>
+        <p class="eyebrow">PWA Mini Permadeath Roguelike</p>
         <h1>虫娘ローグガーデン</h1>
-        <p class="sub">放置で蜜を集め、虫娘を育て、森を探索するミニゲームです。</p>
+        <p class="sub">卵から孵し、名付けて育てる。負けたらロスト。どこまで育てられるか挑戦します。</p>
       </div>
       <button id="saveBtn" class="ghost">保存</button>
     </header>
@@ -25,55 +25,104 @@
       <div><span>花粉</span><b id="pollen">0</b></div>
     </section>
 
-    <nav class="tabs" aria-label="画面切替">
-      <button class="tab active" data-view="garden">庭</button>
-      <button class="tab" data-view="girls">虫娘</button>
-      <button class="tab" data-view="explore">探索</button>
-      <button class="tab" data-view="log">記録</button>
-    </nav>
-
-    <section id="garden" class="view active">
-      <div class="panel garden">
-        <h2>虫かご庭園</h2>
-        <p id="idleText">時間経過で資源が溜まります。</p>
-        <div class="garden-girls" id="gardenGirls"></div>
-        <button id="collectBtn" class="primary">資源を回収</button>
-      </div>
+    <section id="eggScreen" class="panel eggScreen hidden">
+      <h2>卵を選ぶ</h2>
+      <p>3つの卵から1匹を選んで孵化させます。戦闘で敗北すると、その虫娘はロストして卵選択に戻ります。</p>
+      <div id="eggCards" class="cards"></div>
     </section>
 
-    <section id="girls" class="view">
-      <div id="girlCards" class="cards"></div>
+    <section id="nameScreen" class="panel nameScreen hidden">
+      <h2 id="nameTitle">名前をつける</h2>
+      <p>孵った虫娘に名前をつけてください。未入力なら種族名が入ります。</p>
+      <img id="namePreview" class="namePreview" src="./butterfly.png" alt="">
+      <input id="nameInput" class="nameInput" placeholder="名前を入力" maxlength="12">
+      <button id="confirmNameBtn" class="primary">この名前で育てる</button>
     </section>
 
-    <section id="explore" class="view">
-      <div class="panel">
-        <h2>朝露の草むら</h2>
-        <p>虫娘を1人選んで探索します。3択イベントで素材や経験値を持ち帰れます。</p>
-        <label class="selectLabel">探索メンバー</label>
-        <select id="explorerSelect"></select>
-        <button id="startExploreBtn" class="primary">探索開始</button>
-      </div>
+    <div id="gameUI" class="hidden">
+      <nav class="tabs" aria-label="画面切替">
+        <button class="tab active" data-view="garden">庭</button>
+        <button class="tab" data-view="girl">虫娘</button>
+        <button class="tab" data-view="relics">形見</button>
+        <button class="tab" data-view="explore">探索</button>
+        <button class="tab" data-view="record">記録</button>
+      </nav>
 
-      <div id="explorePanel" class="panel hidden">
-        <div class="dungeonTop">
-          <span id="floorText">深度 1 / 5</span>
-          <span id="hpText">HP 10 / 10</span>
+      <section id="garden" class="view active">
+        <div class="panel garden">
+          <h2>虫かご庭園</h2>
+          <p id="runSummary">現在の挑戦</p>
+          <div id="activeGirlBox" class="activeGirlBox"></div>
+          <button id="collectBtn" class="primary">資源を回収</button>
         </div>
-        <h3 id="eventTitle">イベント</h3>
-        <p id="eventText">探索を開始してください。</p>
-        <div id="choices" class="choices"></div>
-      </div>
-    </section>
+      </section>
 
-    <section id="log" class="view">
-      <div class="panel">
-        <h2>冒険記録</h2>
-        <div id="logList" class="logList"></div>
-        <button id="resetBtn" class="danger">データリセット</button>
-      </div>
-    </section>
+      <section id="girl" class="view">
+        <div id="girlCard"></div>
+      </section>
+
+      <section id="relics" class="view">
+        <div class="panel">
+          <h2>形見装備</h2>
+          <p>探索中に手に入る虫たちの形見です。グー・チョキ・パーそれぞれに1つずつ装備できます。形見は挑戦中のみ保持されます。</p>
+          <div id="equipSlots" class="equipSlots"></div>
+        </div>
+        <div id="relicList" class="cards relicCards"></div>
+      </section>
+
+      <section id="explore" class="view">
+        <div class="panel">
+          <h2>朝露の草むら</h2>
+          <p>探索中に戦闘へ入ります。敗北すると虫娘はロストします。</p>
+          <button id="startExploreBtn" class="primary">探索開始</button>
+        </div>
+
+        <div id="explorePanel" class="panel hidden">
+          <div class="dungeonTop">
+            <span id="floorText">深度 1 / 5</span>
+            <span id="hpText">HP 10 / 10</span>
+          </div>
+          <h3 id="eventTitle">イベント</h3>
+          <p id="eventText">探索を開始してください。</p>
+          <div id="choices" class="choices"></div>
+        </div>
+
+        <div id="battlePanel" class="panel battle hidden">
+          <div class="battleStage">
+            <div class="fighter">
+              <img id="playerImg" src="./butterfly.png" alt="">
+              <h3 id="playerName">虫娘</h3>
+              <div class="bar"><i id="playerHpBar"></i></div>
+              <p id="playerHpText">HP</p>
+            </div>
+            <div class="versus">VS</div>
+            <div class="fighter enemy">
+              <div id="enemySprite" class="enemySprite">?</div>
+              <h3 id="enemyName">敵</h3>
+              <p id="enemyHandText" class="handText">得意手</p>
+              <div class="bar enemyBar"><i id="enemyHpBar"></i></div>
+              <p id="enemyHpText">HP</p>
+            </div>
+          </div>
+          <p id="battleText" class="battleText">戦闘開始。</p>
+          <div id="battleActions" class="battleActions"></div>
+        </div>
+      </section>
+
+      <section id="record" class="view">
+        <div class="panel recordPanel">
+          <h2>挑戦記録</h2>
+          <div id="bestRecord" class="bestRecord"></div>
+          <h3>墓標</h3>
+          <div id="graveList" class="logList"></div>
+          <h3>冒険記録</h3>
+          <div id="logList" class="logList"></div>
+          <button id="retireBtn" class="danger">現在の虫娘を引退させる</button>
+          <button id="resetBtn" class="danger">全データリセット</button>
+        </div>
+      </section>
+    </div>
   </main>
-
   <script src="./app.js"></script>
 </body>
 </html>
