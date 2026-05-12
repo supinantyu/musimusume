@@ -14,7 +14,7 @@
       <div>
         <p class="eyebrow">PWA Mini Permadeath Roguelike</p>
         <h1>虫娘ローグガーデン</h1>
-        <p class="sub">卵から孵し、名付けて育てる。負けたらロスト。どこまで育てられるか挑戦します。</p>
+        <p class="sub">卵から孵し、名付けて育てる。探索結果はポップアップで表示されます。</p>
       </div>
       <button id="saveBtn" class="ghost">保存</button>
     </header>
@@ -73,7 +73,7 @@
       <section id="explore" class="view">
         <div class="panel">
           <h2>朝露の草むら</h2>
-          <p>探索中に戦闘へ入ります。敗北すると虫娘はロストします。</p>
+          <p>探索では、毎回3つの行動候補が出ます。戦闘は毎ターンじゃんけんで、勝った側だけがダメージを与えます。</p>
           <button id="startExploreBtn" class="primary">探索開始</button>
         </div>
 
@@ -123,6 +123,16 @@
       </section>
     </div>
   </main>
+
+  <div id="resultModal" class="modal hidden">
+    <div class="modalCard">
+      <div id="modalIcon" class="modalIcon">✦</div>
+      <h2 id="modalTitle">結果</h2>
+      <p id="modalText">結果テキスト</p>
+      <button id="modalOkBtn" class="primary">進む</button>
+    </div>
+  </div>
+
   <script src="./app.js"></script>
 </body>
 </html>
