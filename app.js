@@ -45,21 +45,21 @@ const VARIANTS = {
 };
 const TYPES = [
   {
-    id: "butterfly", species: "モンシロチョウ娘", role: "回復・パー成長", img: "./assets/characters/butterfly_1.png",
+    id: "butterfly", species: "モンシロチョウ娘", role: "回復・パー成長", img: "./assets/characters/butterfly_1.png", eggImg: "./assets/eggs/butterfly_egg.png",
     desc: "おとなしい白い蝶娘。HPとパー攻撃が伸びやすい。",
     base: { hp: 34, def: 3, rock: 7, scissors: 7, paper: 9 },
     growth: { hp: 3, def: 2, rock: 2, scissors: 2, paper: 3 },
     trait: { name: "白愛の翅", desc: "探索中一回だけ、戦闘時に『にげる』を選ぶとHPを小回復する。", escapeHealRate: 0.12 }
   },
   {
-    id: "beetle", species: "カブトムシ娘", role: "耐久・パー成長", img: "./assets/characters/beetle_1.png",
+    id: "beetle", species: "カブトムシ娘", role: "耐久・パー成長", img: "./assets/characters/beetle_1.png", eggImg: "./assets/eggs/beetle_egg.png",
     desc: "頼れる甲虫娘。HP・防御・パー攻撃が伸びやすい。",
     base: { hp: 44, def: 5, rock: 7, scissors: 7, paper: 10 },
     growth: { hp: 3, def: 3, rock: 2, scissors: 2, paper: 4 },
     trait: { name: "兜の誇り", desc: "✌️技を受けた時のダメージが少し多くなる。", scissorsTakenMult: 1.2 }
   },
   {
-    id: "mantis", species: "カマキリ娘", role: "攻撃・チョキ成長", img: "./assets/characters/mantis_1.png",
+    id: "mantis", species: "カマキリ娘", role: "攻撃・チョキ成長", img: "./assets/characters/mantis_1.png", eggImg: "./assets/eggs/mantis_egg.png",
     desc: "緑髪の戦闘的な虫娘。チョキ攻撃が特に伸びやすい。",
     base: { hp: 30, def: 3, rock: 9, scissors: 11, paper: 8 },
     growth: { hp: 2, def: 2, rock: 3, scissors: 4, paper: 3 },
@@ -76,7 +76,7 @@ const ENEMIES = [
 const STRONG_ENEMIES = [
   { id: "hornet", name: "怒れるスズメバチ", img: "./assets/enemies/angry_hornet.png", hand: "scissors", iq: 2, hp: 54, atk: 13, def: 3, reward: { honey: 24, sap: 8, pollen: 10 }, exp: 15, text: "黒と黄色の影が低い羽音を響かせている。", rewardText: "蜜大量。エサも出やすい。" },
   { id: "nightstag", name: "夜闇クワガタ", img: "./assets/enemies/night_stag.png", hand: "scissors", iq: 2, hp: 62, atk: 12, def: 6, reward: { honey: 8, sap: 26, pollen: 8 }, exp: 16, text: "巨大な大顎が暗く光っている。", rewardText: "樹液大量。形見抽選あり。" },
-  { id: "oldspider", name: "古巣の大蜘蛛", img: "./assets/enemies/old_nest_spider.png", hand: "paper", iq: 4, hp: 64, atk: 11, def: 6, reward: { honey: 10, sap: 14, pollen: 26 }, exp: 17, text: "古い巣の主が静かに睨んでいる。", rewardText: "花粉・樹液多め。高IQ。" }
+  { id: "oldspider", name: "古巣の大蜘蛛", img: "./assets/enemies/old_nest_spider.png", hand: "paper", iq: 4, hp: 64, atk: 11, def: 6, reward: { honey: 10, sap: 14, pollen: 26 }, exp: 17, text: "古い巣の主が静かに睨んでいる。", rewardText: "花粉・樹液多め。" }
 ];
 
 const RELIC_DEFS = [
@@ -122,6 +122,7 @@ function defaultState() {
     best: { level: 0, depth: 0, wins: 0, name: "" },
     graves: [],
     log: ["卵を選んで挑戦を開始してください。"],
+    lost: null,
     run: null,
     battle: null
   };
@@ -424,7 +425,7 @@ function startRun() {
   }
   const st = stats();
   state.run = {
-    floor: 1, maxFloor: 6,
+    floor: 1, maxFloor: 5,
     hp: st.hp, maxHp: st.hp,
     rewards: { honey: 0, sap: 0, pollen: 0 },
     relicFound: false,
@@ -591,9 +592,9 @@ function battleAct(hand) {
   state.battle.lastEnemyHand = enemyHand;
   state.battle.lastPlayerWinHand = result === "win" ? hand : null;
   state.battle.turn += 1;
-  let reason = state.battle.turn <= 2 ? `初手は虫娘の高い攻撃を警戒。` : `直前の勝ち手を意識。`;
-  if (enemy.iq >= 3) reason += ` IQ${enemy.iq}なので読み外しも混ぜます。`;
-  let msg = `${handLabel(hand)}で攻撃。相手は${handLabel(enemyHand)}。\n判定：${result === "win" ? "勝利" : result === "draw" ? "あいこ" : "敗北"}\n敵AI：${reason}\n与ダメージ ${dealt}`;
+  let msg = `${handLabel(hand)}で攻撃。相手は${handLabel(enemyHand)}。
+判定：${result === "win" ? "勝利" : result === "draw" ? "あいこ" : "敗北"}
+与ダメージ ${dealt}`;
   if (incoming > 0) msg += ` / 被ダメージ ${incoming}`;
   else msg += ` / 被ダメージ 0`;
   if (relicInfo.messages.length) msg += `\n${relicInfo.messages.join("\n")}`;
@@ -650,8 +651,19 @@ function winBattle() {
 }
 function permaDeath(reason) {
   if (!state.active) return;
-  state.graves.unshift({ name: state.active.name, species: activeType().species, variant: state.active.variantLabel || "標準個体", level: state.active.level, depth: state.active.maxDepth, wins: state.active.wins, reason, date: new Date().toLocaleString("ja-JP") });
+  const lost = {
+    name: state.active.name,
+    species: activeType().species,
+    variant: state.active.variantLabel || "標準個体",
+    level: state.active.level,
+    depth: state.active.maxDepth,
+    wins: state.active.wins,
+    reason,
+    date: new Date().toLocaleString("ja-JP")
+  };
+  state.graves.unshift(lost);
   state.graves = state.graves.slice(0, 30);
+  state.lost = lost;
   addLog(`${state.active.name}はロストしました。${reason}`);
   state.active = null;
   state.relics = [];
@@ -678,9 +690,8 @@ function renderEggs() {
   const box = document.getElementById("eggCards");
   box.innerHTML = TYPES.map(t => `
     <article class="card eggCard">
-      <img src="${t.img}" alt="${t.species}">
+      <img src="${t.eggImg || t.img}" alt="${t.species}の卵">
       <div class="cardTop"><h3>${t.species}</h3><span class="eggType">${t.role}</span></div>
-      <p class="stats">${t.desc}</p>
       <p class="growth">成長率：HP${stars5(t.growth.hp)} / 防御${stars5(t.growth.def)} / ✊${stars5(t.growth.rock)} / ✌️${stars5(t.growth.scissors)} / ✋${stars5(t.growth.paper)}</p>
       <div class="traitBox"><b>${t.trait.name}</b><div class="mini">${t.trait.desc}</div></div>
       <button data-egg="${t.id}" class="primary">この卵を選ぶ</button>
@@ -688,23 +699,16 @@ function renderEggs() {
   box.querySelectorAll("[data-egg]").forEach(btn => btn.onclick = () => selectEgg(btn.dataset.egg));
 }
 function renderGarden() {
-  const runSummary = document.getElementById("runSummary");
   const box = document.getElementById("activeGirlBox");
-  const collectBtn = document.getElementById("collectBtn");
   if (!state.active) {
-    runSummary.textContent = "現在の挑戦：待機中";
     box.innerHTML = `<p>卵を選ぶとここに現在の虫娘が表示されます。</p>`;
-    collectBtn.disabled = true;
     return;
   }
-  collectBtn.disabled = false;
   const st = stats();
-  runSummary.textContent = state.run ? `探索中：深度 ${state.run.floor} / ${state.run.maxFloor}` : `現在の挑戦：待機中（朝露の森 推奨Lv.15）`;
   box.innerHTML = `
     <img src="${activeImage()}" alt="${state.active.name}">
     <div class="meta">
       <div class="cardTop"><h3>${state.active.name}</h3><span class="level">Lv.${state.active.level}</span></div>
-      <p class="stats">${activeType().species} / ${state.active.variantLabel}<br>${activeType().desc}<br>${state.active.variantTrait || ""}</p>
       <div class="traitBox"><b>${activeType().trait.name}</b><div class="mini">${activeType().trait.desc}</div></div>
       <p class="stats">HP ${st.hp} / 防御 ${st.def} / ✊ ${st.rock} / ✌️ ${st.scissors} / ✋ ${st.paper}</p>
       <p class="growth">成長率：HP${stars5(activeType().growth.hp)} / 防御${stars5(activeType().growth.def)} / ✊${stars5(activeType().growth.rock)} / ✌️${stars5(activeType().growth.scissors)} / ✋${stars5(activeType().growth.paper)}</p>
@@ -809,7 +813,7 @@ function renderExplore() {
     document.getElementById("playerHpBar").style.width = `${clamp((state.run.hp / state.run.maxHp) * 100, 0, 100)}%`;
     document.getElementById("enemySprite").innerHTML = `<img src="${state.battle.enemy.img}" alt="${state.battle.enemy.name}">`;
     document.getElementById("enemyName").textContent = state.battle.enemy.name;
-    document.getElementById("enemyHandText").innerHTML = `得意手：${handLabel(state.battle.enemy.hand)} / IQ${state.battle.enemy.iq}<br><span class="aiHint">初手は虫娘の高い攻撃を警戒。勝たれた後はその手を潰しに来ます。</span>`;
+    document.getElementById("enemyHandText").innerHTML = `得意手：${handLabel(state.battle.enemy.hand)}`;
     document.getElementById("enemyHpText").textContent = `HP ${Math.max(0, state.battle.enemyHp)} / ${state.battle.enemy.hp}`;
     document.getElementById("enemyHpBar").style.width = `${clamp((state.battle.enemyHp / state.battle.enemy.hp) * 100, 0, 100)}%`;
     document.getElementById("battleText").textContent = state.battle.text;
@@ -839,16 +843,30 @@ function renderRecord() {
   graves.innerHTML = state.graves.length ? state.graves.map(g => `<div class="logItem"><b>${g.name}</b> / ${g.species} / ${g.variant}<br>Lv.${g.level}・深度${g.depth}・${g.wins}勝<br>${g.reason}<br>${g.date}</div>`).join("") : `<div class="logItem">まだ墓標はありません。</div>`;
   document.getElementById("logList").innerHTML = state.log.map(t => `<div class="logItem">${t}</div>`).join("");
 }
+function backToEggSelect() {
+  state.lost = null;
+  save(true);
+  render();
+}
 function render() {
   ensureFeeds();
   updateEnergy();
   const active = !!state.active;
+  const lost = !!state.lost;
   document.getElementById("honey").textContent = state.resources.honey;
   document.getElementById("sap").textContent = state.resources.sap;
   document.getElementById("pollen").textContent = state.resources.pollen;
-  document.getElementById("eggScreen").classList.toggle("hidden", active || !!pendingType);
-  document.getElementById("nameScreen").classList.toggle("hidden", !pendingType);
-  document.getElementById("gameUI").classList.toggle("hidden", !active);
+  document.getElementById("eggScreen").classList.toggle("hidden", active || !!pendingType || lost);
+  document.getElementById("nameScreen").classList.toggle("hidden", !pendingType || lost);
+  const lostScreen = document.getElementById("lostScreen");
+  if (lostScreen) {
+    lostScreen.classList.toggle("hidden", !lost);
+    if (lost) {
+      document.getElementById("lostTitle").textContent = `${state.lost.name}は死んでしまった……`;
+      document.getElementById("lostSummary").textContent = `Lv.${state.lost.level} / 深度${state.lost.depth} / ${state.lost.wins}勝\n${state.lost.reason}`;
+    }
+  }
+  document.getElementById("gameUI").classList.toggle("hidden", !active || lost);
   renderEggs();
   renderGarden();
   renderGirlView();
@@ -871,11 +889,12 @@ function init() {
   initTabs();
   document.getElementById("saveBtn").onclick = () => { save(); render(); };
   document.getElementById("confirmNameBtn").onclick = confirmName;
-  document.getElementById("collectBtn").onclick = collect;
   document.getElementById("startExploreBtn").onclick = startRun;
   document.getElementById("modalOkBtn").onclick = closeModal;
   document.getElementById("retireBtn").onclick = retireCurrent;
   document.getElementById("resetBtn").onclick = resetAll;
+  const backToEggBtn = document.getElementById("backToEggBtn");
+  if (backToEggBtn) backToEggBtn.onclick = backToEggSelect;
   render();
   setInterval(renderExplore, 30000);
 }
