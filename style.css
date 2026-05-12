@@ -34,3 +34,30 @@ button,select,input{font:inherit}button{border:0;border-radius:14px;padding:12px
 .modalCard{width:min(440px,100%);background:linear-gradient(180deg,rgba(255,255,255,.07),transparent),#182417;border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 18px 60px rgba(0,0,0,.45);text-align:center}
 .modalIcon{font-size:54px;margin-bottom:8px}.modalCard p{color:var(--muted);text-align:left;background:#111910;border:1px solid var(--line);border-radius:14px;padding:12px}
 @media(max-width:640px){.app{padding:12px}.hero{align-items:stretch}h1{font-size:24px}.tabs{gap:5px}.tab{font-size:13px;padding:9px 4px}.resources b{font-size:20px}.battleStage,.activeGirlBox,.equipSlots{grid-template-columns:1fr}.versus{display:none}.fighter{min-height:auto}.enemySprite{width:120px;height:120px;font-size:56px}}
+
+.choices button::before{content:'？ ';color:#10200e;font-weight:1000;}
+
+.feedBox{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:16px;background:#223020}
+.feedGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+.feedGrid button{font-size:13px;line-height:1.35;text-align:left;background:#f5e7a4;color:#1c1808}
+
+.growth{font-size:12px;line-height:1.5;color:#f4e7b0}
+
+.trait{color:#dff7c8;font-weight:700}
+
+.relicArt{width:100%;max-height:180px;object-fit:contain;display:block;background:rgba(255,255,255,.025);border-radius:16px;margin-bottom:8px}
+.slot .relicArt{max-height:120px}
+.modalCard p{white-space:pre-wrap}
+.activeGirlBox .meta{display:flex;flex-direction:column;gap:8px}
+.trainGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-top:10px}
+.trainGrid button{font-size:13px;line-height:1.35;text-align:center;background:#f5e7a4;color:#1c1808}
+.note{font-size:12px;color:var(--muted)}
+.mini{font-size:12px;color:var(--muted)}
+.traitBox{padding:10px 12px;border-radius:14px;background:#223020;border:1px solid var(--line)}
+.relicEffect{color:#dff7c8;font-weight:700}
+
+.energyBox{margin:10px 0 0;padding:10px 12px;border-radius:14px;background:#223020;border:1px solid var(--line);color:var(--accent2);font-weight:900;text-align:center}
+.enemyImg{width:100%;max-height:190px;object-fit:contain;display:block;margin:0 auto;background:rgba(255,255,255,.025);border-radius:16px}
+.enemySprite{background:rgba(255,255,255,.025)!important;border:1px solid var(--line)!important}
+.enemySprite img{width:100%;height:100%;object-fit:contain}
+.aiHint{font-size:12px;color:var(--muted);line-height:1.45}
