@@ -1,5 +1,5 @@
 
-const SAVE_KEY = "mushimusume_v22_bond_quotes";
+const SAVE_KEY = "mushimusume_v29_hatch_quote_layout_fix";
 const ENERGY_MAX = 3;
 const ENERGY_RECOVER_MS = 20 * 60 * 1000;
 
@@ -309,6 +309,7 @@ const OUTCOME_TEXT = {
 };
 
 let pendingType = null;
+let pendingVariant = null;
 let pendingModalAction = null;
 let currentEvent = null;
 let state = load();
@@ -464,6 +465,7 @@ function giveExp(amount) {
   while (state.active.feedExp >= nextLevelExp()) {
     state.active.feedExp -= nextLevelExp();
     state.active.level += 1;
+    state.currentQuote = randomGirlQuote();
     leveled += 1;
   }
   updateBest();
@@ -532,17 +534,18 @@ function selectEgg(id) {
   savePlayerNameFromInput();
   pendingType = id;
   const t = typeDef(id);
+  pendingVariant = randomVariant(t.id);
   document.getElementById("eggScreen").classList.add("hidden");
   document.getElementById("nameScreen").classList.remove("hidden");
   document.getElementById("nameTitle").textContent = `${t.species}が孵りました`;
-  document.getElementById("namePreview").src = t.img;
+  document.getElementById("namePreview").src = pendingVariant.img || t.img;
   document.getElementById("nameInput").value = t.species;
 }
 function confirmName() {
   if (!pendingType) return;
   const t = typeDef(pendingType);
   const name = document.getElementById("nameInput").value.trim() || t.species;
-  const v = randomVariant(t.id);
+  const v = pendingVariant || randomVariant(t.id);
   state.active = {
     typeId: t.id, name,
     variantId: v.id, variantLabel: v.label, variantTrait: v.trait, variantImg: v.img,
@@ -556,6 +559,7 @@ function confirmName() {
   state.currentQuote = randomGirlQuote();
   addLog(`${name}が孵化しました。個体：${state.active.variantLabel}`);
   pendingType = null;
+  pendingVariant = null;
   document.getElementById("nameScreen").classList.add("hidden");
   save(true);
   render();
@@ -1055,24 +1059,17 @@ function renderGarden() {
   const st = stats();
   if (!state.currentQuote) state.currentQuote = randomGirlQuote();
   box.innerHTML = `
-    <img id="talkGirlImg" src="${activeImage()}" alt="${state.active.name}">
+    <img src="${activeImage()}" alt="${state.active.name}">
     <div class="meta">
       <div class="cardTop"><h3>${state.active.name}</h3><span class="level">Lv.${state.active.level}</span></div>
+      <div class="speechBox simpleSpeechBox">
+        <div class="speechText">「${state.currentQuote}」</div>
+      </div>
       <div class="traitBox"><b>${activeType().trait.name}</b><div class="mini">${activeType().trait.desc}</div></div>
       <p class="stats">HP ${st.hp} / 防御 ${st.def} / ✊ ${st.rock} / ✌️ ${st.scissors} / ✋ ${st.paper}</p>
       <p class="growth">成長率：HP${stars5(activeType().growth.hp)} / 防御${stars5(activeType().growth.def)} / ✊${stars5(activeType().growth.rock)} / ✌️${stars5(activeType().growth.scissors)} / ✋${stars5(activeType().growth.paper)}</p>
       <p class="note">次のLvまで ${Math.max(0, nextLevelExp() - (state.active.feedExp || 0))} EXP</p>
-      <div class="speechBox">
-        <div class="speaker">${state.active.name} <span class="bondTier">${quoteTierForLevel(state.active.level || 1) === "bond20" ? "好感度Lv.20+" : quoteTierForLevel(state.active.level || 1) === "bond10" ? "好感度Lv.10+" : "通常"}</span></div>
-        <div class="speechText">「${state.currentQuote}」</div>
-        <div class="talkHint">画像タップ、またはボタンで話しかけられます。</div>
-      </div>
-      <button id="talkBtn" class="primary">話す</button>
     </div>`;
-  const talkBtn = document.getElementById("talkBtn");
-  if (talkBtn) talkBtn.onclick = speakGirl;
-  const img = document.getElementById("talkGirlImg");
-  if (img) img.onclick = speakGirl;
 }
 function renderGirlView() {
   const el = document.getElementById("girlCard");

@@ -1,4 +1,4 @@
-const CACHE_NAME="mushimusume-v28-revert-to-uploaded-app";
+const CACHE_NAME="mushimusume-v29-hatch-quote-layout-fix";
 const ASSETS=[
   "./README.md",
   "./app.js",
