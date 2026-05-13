@@ -1,5 +1,5 @@
 
-const SAVE_KEY = "mushimusume_v23_girl_tab_quote_layout";
+const SAVE_KEY = "mushimusume_v26_explore_card_tap_fix";
 const ENERGY_MAX = 3;
 const ENERGY_RECOVER_MS = 20 * 60 * 1000;
 
@@ -1217,24 +1217,31 @@ function renderExplore() {
   updateEnergy();
   const energyBox = document.getElementById("energyBox");
   if (energyBox) energyBox.textContent = `探索力 ${state.energy.value} / ${ENERGY_MAX}　${nextEnergyText()}`;
+
+  const cardsWrap = document.getElementById("exploreCardsWrap");
   const areaCards = document.getElementById("areaCards");
   const explorePanel = document.getElementById("explorePanel");
   const battlePanel = document.getElementById("battlePanel");
 
-  if (areaCards) {
-    const disabled = !state.active || !!state.run || state.energy.value <= 0;
+  const canStart = !!state.active && !state.run && state.energy.value > 0;
+
+  if (cardsWrap) cardsWrap.classList.toggle("hidden", !!state.run);
+  if (areaCards && !state.run) {
     areaCards.innerHTML = Object.values(AREA_DEFS).map(area => `
-      <article class="exploreImageCard ${disabled ? "disabled" : ""}" data-area="${area.id}" aria-label="${area.name}を探索する">
+      <article class="exploreImageCard ${canStart ? "" : "disabled"}" data-area="${area.id}" aria-label="${area.name}を探索する">
         <img src="${area.cardImg}" alt="${area.name}">
-        <button class="areaCardHitbox" data-area="${area.id}" ${disabled ? "disabled" : ""}>探索する</button>
+        <button class="areaCardHitbox" type="button" data-area="${area.id}" ${canStart ? "" : "disabled"} aria-label="${area.name}を探索する"></button>
       </article>
     `).join("");
-    areaCards.querySelectorAll("[data-area]").forEach(el => {
-      el.onclick = (ev) => {
-        const areaId = el.dataset.area;
-        if (!areaId || disabled) return;
-        ev.preventDefault();
-        startRunForArea(areaId);
+
+    areaCards.querySelectorAll(".exploreImageCard").forEach(card => {
+      card.onclick = () => {
+        if (!canStart) return;
+        startRunForArea(card.dataset.area);
+        setTimeout(() => {
+          const target = document.getElementById("explorePanel") || document.getElementById("battlePanel");
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 80);
       };
     });
   }
@@ -1244,6 +1251,7 @@ function renderExplore() {
     if (battlePanel) battlePanel.classList.add("hidden");
     return;
   }
+
   if (!state.run) {
     if (explorePanel) explorePanel.classList.add("hidden");
     if (battlePanel) battlePanel.classList.add("hidden");
@@ -1252,6 +1260,7 @@ function renderExplore() {
 
   document.getElementById("floorText").textContent = `${state.run.areaName || currentArea().name}　深度 ${state.run.floor} / ${state.run.maxFloor}`;
   document.getElementById("hpText").textContent = `HP ${Math.max(0, state.run.hp)} / ${state.run.maxHp}`;
+
   if (state.battle) {
     explorePanel.classList.add("hidden");
     battlePanel.classList.remove("hidden");

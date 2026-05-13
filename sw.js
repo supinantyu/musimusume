@@ -1,4 +1,4 @@
-const CACHE_NAME="mushimusume-v25-explore-image-cards";
+const CACHE_NAME="mushimusume-v26-explore-card-tap-fix";
 const ASSETS=[
   "./README.md",
   "./app.js",

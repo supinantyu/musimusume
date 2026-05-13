@@ -133,3 +133,30 @@ button,select,input{font:inherit}button{border:0;border-radius:14px;padding:12px
   .exploreImageCard{border-radius:16px}
   .exploreImageCard img{border-radius:16px}
 }
+
+.exploreImageCard{
+  cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.areaCardHitbox{
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  background:transparent !important;
+  color:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  outline:0 !important;
+  text-indent:-9999px !important;
+  font-size:0 !important;
+  line-height:0 !important;
+  opacity:1 !important;
+  z-index:4;
+}
+.areaCardHitbox::before,
+.areaCardHitbox::after{
+  content:none !important;
+}
+.exploreImageCard.disabled{
+  cursor:not-allowed;
+  pointer-events:none;
+}
