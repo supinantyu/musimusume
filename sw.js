@@ -1,4 +1,4 @@
-const CACHE_NAME="mushimusume-v26-explore-card-tap-fix";
+const CACHE_NAME="mushimusume-v28-revert-to-uploaded-app";
 const ASSETS=[
   "./README.md",
   "./app.js",
@@ -30,8 +30,6 @@ const ASSETS=[
   "./assets/enemies/rotten_centipede.png",
   "./assets/enemies/territorial_bee.png",
   "./assets/enemies/web_spider.png",
-  "./assets/fields/card_dew_forest.jpeg",
-  "./assets/fields/card_sap_oldwood.jpeg",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/relics/beetle_1.png",

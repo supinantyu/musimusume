@@ -20,10 +20,10 @@ h1{font-size:30px;margin:0} h2,h3{margin:0 0 10px}.sub,p{line-height:1.6}.sub{co
 button,select,input{font:inherit}button{border:0;border-radius:14px;padding:12px 14px;color:#10200e;background:var(--accent);font-weight:800}button:active{transform:translateY(1px)}button:disabled{opacity:.45}
 .ghost{background:#263624;color:var(--text);border:1px solid var(--line)}.tab{background:#263624;color:var(--muted);border:1px solid var(--line);padding:10px 8px}.tab.active{background:var(--accent);color:#10200e}
 .primary{width:100%;margin-top:14px}.danger{background:var(--danger);color:#250909;width:100%;margin-top:14px}.view{display:none}.view.active{display:block}.hidden{display:none!important}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:14px}.card img{width:100%;height:260px;object-fit:contain;display:block;background:transparent;border-radius:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:14px}.card img{width:100%;height:260px;object-fit:contain;display:block;background:rgba(255,255,255,.025);border-radius:16px}
 .eggCard{text-align:center}.eggIcon{font-size:76px;margin:12px 0}.eggType{color:var(--accent2);font-weight:900}
-.namePreview{width:100%;max-height:300px;object-fit:contain;display:block;background:transparent;border-radius:18px}.nameInput{width:100%;margin-top:12px;padding:14px;border-radius:14px;background:#263624;color:var(--text);border:1px solid var(--line)}
-.activeGirlBox{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:center}.activeGirlBox img{width:100%;max-height:320px;object-fit:contain;background:transparent;border-radius:18px}
+.namePreview{width:100%;max-height:300px;object-fit:contain;display:block;background:rgba(255,255,255,.025);border-radius:18px}.nameInput{width:100%;margin-top:12px;padding:14px;border-radius:14px;background:#263624;color:var(--text);border:1px solid var(--line)}
+.activeGirlBox{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:center}.activeGirlBox img{width:100%;max-height:320px;object-fit:contain;background:rgba(255,255,255,.025);border-radius:18px}
 .cardTop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}.level,.rarity{color:var(--accent2);font-weight:900}.stats{color:var(--muted);line-height:1.55;font-size:14px}.handBadge{display:inline-block;padding:4px 9px;border-radius:999px;background:#263624;border:1px solid var(--line);color:var(--accent2);font-weight:900}
 #explorePanel,#battlePanel{margin-top:12px}.dungeonTop{display:flex;justify-content:space-between;color:var(--accent2);font-weight:800;margin-bottom:12px}.choices,.battleActions{display:grid;gap:8px;margin-top:12px}.choices button,.battleActions button{text-align:left;background:#d6f7c7}
 .logList{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;margin-bottom:12px}.logItem{padding:10px;background:#223020;border:1px solid var(--line);border-radius:12px;color:var(--muted);line-height:1.5}
@@ -45,7 +45,7 @@ button,select,input{font:inherit}button{border:0;border-radius:14px;padding:12px
 
 .trait{color:#dff7c8;font-weight:700}
 
-.relicArt{width:100%;max-height:180px;object-fit:contain;display:block;background:transparent;border-radius:16px;margin-bottom:8px}
+.relicArt{width:100%;max-height:180px;object-fit:contain;display:block;background:rgba(255,255,255,.025);border-radius:16px;margin-bottom:8px}
 .slot .relicArt{max-height:120px}
 .modalCard p{white-space:pre-wrap}
 .activeGirlBox .meta{display:flex;flex-direction:column;gap:8px}
@@ -57,7 +57,7 @@ button,select,input{font:inherit}button{border:0;border-radius:14px;padding:12px
 .relicEffect{color:#dff7c8;font-weight:700}
 
 .energyBox{margin:10px 0 0;padding:10px 12px;border-radius:14px;background:#223020;border:1px solid var(--line);color:var(--accent2);font-weight:900;text-align:center}
-.enemyImg{width:100%;max-height:190px;object-fit:contain;display:block;margin:0 auto;background:transparent;border-radius:16px}
+.enemyImg{width:100%;max-height:190px;object-fit:contain;display:block;margin:0 auto;background:rgba(255,255,255,.025);border-radius:16px}
 .enemySprite{background:rgba(255,255,255,.025)!important;border:1px solid var(--line)!important}
 .enemySprite img{width:100%;height:100%;object-fit:contain}
 .aiHint{font-size:12px;color:var(--muted);line-height:1.45}
@@ -73,90 +73,9 @@ button,select,input{font:inherit}button{border:0;border-radius:14px;padding:12px
 
 .playerNameBox{display:grid;gap:8px;margin:12px 0 18px}
 .playerNameBox label{font-weight:900;color:var(--accent2)}
-.speechBox{margin:12px 0 16px;padding:14px 16px;border-radius:18px;background:#101b12;border:1px solid var(--line);line-height:1.7}
+.speechBox{margin-top:14px;padding:14px 16px;border-radius:18px;background:#101b12;border:1px solid var(--line);line-height:1.7}
 .speechBox .speaker{font-weight:900;color:var(--accent2);font-size:14px;margin-bottom:4px}
 .speechText{white-space:pre-line}
-.talkHint{display:none}
+.talkHint{font-size:12px;color:var(--muted);margin-top:8px}
 
 .bondTier{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:800}
-
-.exploreCardsWrap{
-  margin-top:16px;
-}
-.exploreCardsWrap h2{
-  margin:0 0 12px;
-  font-size:28px;
-}
-.areaCards{
-  display:grid;
-  gap:16px;
-}
-.exploreImageCard{
-  position:relative;
-  overflow:hidden;
-  border-radius:22px;
-  border:1px solid rgba(236,214,151,.28);
-  box-shadow:0 18px 36px rgba(0,0,0,.24);
-  background:#102012;
-}
-.exploreImageCard img{
-  display:block;
-  width:100%;
-  height:auto;
-  border-radius:22px;
-  user-select:none;
-  -webkit-user-select:none;
-}
-.exploreImageCard.disabled{
-  filter:saturate(.82) brightness(.72);
-}
-.areaCardHitbox{
-  position:absolute;
-  left:7.2%;
-  right:7.2%;
-  bottom:7.5%;
-  height:25%;
-  border:0;
-  padding:0;
-  margin:0;
-  opacity:0;
-  cursor:pointer;
-}
-.areaCardHitbox:disabled{
-  cursor:not-allowed;
-}
-.exploreEnergy{
-  margin:0 0 14px;
-}
-@media (max-width:520px){
-  .areaCards{gap:12px}
-  .exploreImageCard{border-radius:16px}
-  .exploreImageCard img{border-radius:16px}
-}
-
-.exploreImageCard{
-  cursor:pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.areaCardHitbox{
-  appearance:none !important;
-  -webkit-appearance:none !important;
-  background:transparent !important;
-  color:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  outline:0 !important;
-  text-indent:-9999px !important;
-  font-size:0 !important;
-  line-height:0 !important;
-  opacity:1 !important;
-  z-index:4;
-}
-.areaCardHitbox::before,
-.areaCardHitbox::after{
-  content:none !important;
-}
-.exploreImageCard.disabled{
-  cursor:not-allowed;
-  pointer-events:none;
-}
