@@ -1,5 +1,5 @@
 
-const SAVE_KEY = "mushimusume_v22_bond_quotes";
+const SAVE_KEY = "mushimusume_v23_girl_tab_quote_layout";
 const ENERGY_MAX = 3;
 const ENERGY_RECOVER_MS = 20 * 60 * 1000;
 
@@ -124,55 +124,108 @@ const GIRL_QUOTES = {
   },
   beetle: {
     normal: [
-      "{player}、前は私が守ります。",
-      "防御なら任せてください。簡単には倒れません。",
-      "私は退きません。必要なら、何度でも前に出ます。",
-      "{player}、次の指示を。私はまだ戦えます。",
-      "この甲殻は飾りではありません。守るためのものです。",
-      "敵が強いほど、こちらも落ち着く必要があります。",
-      "無理に攻める必要はありません。耐えて、勝機を待ちましょう。",
-      "私の役目は、最後まで立っていることです。",
-      "{player}、危ない時は下がってください。前線は私が持ちます。",
-      "誇りはあります。でも、それより大事なのは生き残ることです。",
-      "チョキの相手は少し苦手です。ですが、対策すれば問題ありません。",
-      "装備の確認を。小さな差が、生死を分けます。",
-      "焦らず行きましょう。硬い敵ほど、崩す順番が大事です。",
-      "{player}、私は信じています。あなたの判断を。",
-      "帰るまでが探索です。勝っても、油断はしません。"
+      "{player}、前は私が守るからねっ。",
+      "大丈夫大丈夫、私けっこう頑丈だから。昔からそうでしょ？",
+      "{player}、次どうする？ 私、すぐ動けるよ。",
+      "へへ、任せて。こういう時こそ私の出番だよ。",
+      "この甲殻、飾りじゃないからね。ちゃんと守るためのやつ。",
+      "焦らなくていいよ、{player}。私が前で受けるから。",
+      "強い敵ほど燃える……って言うとカマキリっぽいかな。私はちゃんと落ち着くよ。",
+      "私、最後まで立ってるから。だから{player}も諦めないで。",
+      "{player}が危なかったら、私が止める。これは決定事項です。",
+      "昔から面倒見いいって言われるんだよね。……自分で言うとちょっと変だけど。",
+      "チョキの相手はちょっと苦手。でも、{player}とならどうにかするよ。",
+      "装備の確認しよっか。忘れ物すると、あとで森に怒られるから。",
+      "硬い敵はじっくり崩そう。私、待つのは得意だよ。",
+      "{player}、私は信じてるよ。ちゃんと見てるからね。",
+      "帰るまでが探索。ほら、最後まで一緒に行こ。"
     ],
     bond10: [
-      "{player}、私の背中は預けてください。前より、うまく守れるはずです。",
-      "あなたの判断なら、私は迷わず前に出られます。",
-      "守るだけでは足りません。守りながら勝つ。それが今の目標です。",
-      "{player}、無茶をする時は先に言ってください。止めるか、付き合うか決めます。",
-      "私は不器用です。ですが、信頼には行動で返します。",
-      "前より少し、戦場が見えるようになりました。あなたのおかげです。",
-      "{player}、疲れたら私の後ろへ。短い休息なら作れます。",
-      "誇りとは、倒れないことではありません。倒れても立つ理由を持つことです。",
-      "私はまだ強くなれます。あなたを守るには、まだ足りません。",
-      "敵の攻撃が重いほど、受け止める意味があります。",
-      "{player}、私を頼ってください。頼られるために、ここにいます。",
-      "勝つために耐える。耐えるために鍛える。単純ですが、私に合っています。",
-      "苦手な相手も覚えました。次は、もっと上手く対処します。",
-      "あなたの声があると、私は前を向きやすい。",
-      "この森を抜けるまで、私の甲殻は割らせません。"
+      "{player}、私の後ろにいて。……いや、隣でもいいけどね。",
+      "前より息が合ってきたよね。こういうの、ちょっと嬉しい。",
+      "守るだけじゃなくて、一緒に勝ちたい。今はそう思ってるよ。",
+      "{player}が無茶しそうな顔してる。そういうの、幼馴染センサーで分かるから。",
+      "私、不器用だけどさ。頼られるのは、けっこう好きだよ。",
+      "戦い方、前より分かってきた。{player}の癖も、ちょっと分かってきた。",
+      "疲れたら言って。少しくらいなら私が引っ張ってあげる。",
+      "倒れても立つ理由？ そんなの、{player}がいるからでしょ。",
+      "もっと強くなりたいな。守りたい相手がいると、欲張りになるね。",
+      "敵の攻撃が重くても平気。私の方が、気持ちはずっと重いから。",
+      "{player}、もっと頼っていいよ。昔からそういう役、嫌いじゃないし。",
+      "耐えて、見て、勝つ。単純だけど、私たちらしいでしょ。",
+      "苦手な相手も覚えたよ。次はもっと上手くやる。",
+      "{player}の声、ちゃんと届いてる。だから私は迷わない。",
+      "この森を抜けるまで、私が前にいる。約束ね。"
     ],
     bond20: [
-      "{player}、私はあなたを守るために強くなりました。これだけは、誇れます。",
-      "あなたが進むなら、私は道を開きます。あなたが止まるなら、私は盾になります。",
-      "私の強さは、もう私だけのものではありません。",
-      "{player}、ここまで来られたことを誇ってください。私は、あなたを誇りに思います。",
-      "守る理由があると、甲殻はもっと硬くなります。不思議ですね。",
-      "私は倒れません。倒れるとしても、あなたを帰した後です。",
-      "{player}、あなたの判断に命を預けることを、私は怖いとは思いません。",
-      "どれだけ森が深くても、私の立つ場所は決まっています。あなたの前です。",
-      "あなたが呼べば、私は何度でも立ち上がります。",
-      "不器用な私ですが、そばにいることだけは上手くなれたと思います。",
-      "この角も、甲殻も、全部あなたと帰るためにあります。",
-      "{player}、あなたが無事なら、それが私の勝利です。",
-      "私はただの盾ではありません。あなたと勝つための相棒です。",
-      "怖くないわけではありません。ですが、あなたを失う方がずっと怖い。",
-      "帰りましょう、{player}。勝って、胸を張って。"
+      "{player}、私はあなたを守るために強くなったんだと思う。",
+      "あなたが進むなら、私も進む。止まるなら、一緒に休む。それでいいでしょ。",
+      "私の強さは、もう私だけのものじゃないよ。",
+      "{player}、ここまで来たんだよ。すごいじゃん、私たち。",
+      "守る理由があると、甲殻ってもっと硬くなるんだね。たぶん気合い。",
+      "倒れないよ。倒れるとしても、{player}を帰してから。",
+      "{player}の判断なら、私は怖くない。昔から、わりと信じてるし。",
+      "森が深くても大丈夫。私の立つ場所は、あなたのすぐ前だから。",
+      "呼んでくれたら、何度でも立つよ。そういうの、幼馴染っぽいでしょ。",
+      "不器用だけど、そばにいるのは得意になったと思う。",
+      "この角も、甲殻も、ぜんぶ{player}と帰るためにある。",
+      "{player}が無事なら、それが私の勝ち。……でも一緒に勝てたらもっといい。",
+      "私は盾だけじゃないよ。{player}の相棒だから。",
+      "怖くないわけじゃない。でも、{player}がいなくなる方がずっと怖い。",
+      "帰ろう、{player}。勝って、笑って、また次の森に行こう。"
+    ]
+  },
+  beetle_mysterious: {
+    normal: [
+      "{player}……森の音が、少し沈んでいます。",
+      "私の前に出ないで。影が、こちらを見ています。",
+      "静かに。今は、足音も嘘をつきます。",
+      "この甲殻は、夜の色に近い。隠れるには悪くありません。",
+      "{player}、急がないで。急ぐほど、森に見つかります。",
+      "敵はまだ遠い。けれど、気配だけは近いです。",
+      "私は守ります。言葉より、そちらの方が確かです。",
+      "この道、さっきより暗い。……気のせいならいいのですが。",
+      "{player}の呼吸が乱れたら、そこで止まりましょう。",
+      "戦いは音です。勝てる時は、刃より先に空気が変わります。",
+      "私の角に触れないでください。……いえ、今は集中したいだけです。",
+      "影の中でも、あなたの位置は分かります。",
+      "{player}、私から離れないで。",
+      "怖いわけではありません。ただ、森を信用していないだけです。",
+      "大丈夫。私はまだ、見えない敵を見ています。"
+    ],
+    bond10: [
+      "{player}、あなたの足音なら、もう聞き分けられます。",
+      "前より、あなたの隣は静かです。悪くありません。",
+      "私を信じてくれるのなら、暗い道は私が選びます。",
+      "無理はしないで。あなたが消えると、森の音が乱れます。",
+      "{player}が近くにいると、夜の気配が少し薄くなります。",
+      "私は多くを話しません。でも、見ていないわけではありません。",
+      "あなたの判断は、ときどき不思議です。けれど、嫌いではありません。",
+      "影が濃い場所ほど、私の目は冴えます。",
+      "{player}、合図を。私は静かに前へ出ます。",
+      "守る理由を、少しだけ理解しました。……あなたのせいです。",
+      "この森があなたを隠すなら、私は森ごと見張ります。",
+      "危険な時ほど、声を落として。私はそれでも聞こえます。",
+      "あなたが名前を呼ぶと、暗闇の輪郭が変わります。",
+      "私はここにいます。必要なら、影の中からでも。",
+      "{player}、帰り道は覚えています。あなたの分も。"
+    ],
+    bond20: [
+      "{player}、闇の中でもあなたの場所だけは間違えません。",
+      "あなたが進むなら、私は影を裂いて道を作ります。",
+      "私は静かなままでいい。あなたが分かってくれるなら、それで十分です。",
+      "森が何を隠しても、あなたは隠させません。",
+      "{player}、あなたの声は、夜でもまっすぐ届きます。",
+      "守ることに理由は要りません。けれど今は、理由の名前を知っています。",
+      "あなたがいない静けさは、あまり好きではありません。",
+      "怖いものはあります。あなたが見えなくなることです。",
+      "私の角も甲殻も、この暗い森であなたを見失わないためにあります。",
+      "{player}、少しだけ近くに。……その方が、戦いやすいので。",
+      "あなたの隣なら、沈黙も悪くありません。",
+      "私は前に立ちます。あなたは、私の影を追ってください。",
+      "この森の夜より、あなたを失う想像の方が深い。",
+      "帰りましょう、{player}。夜が閉じる前に。",
+      "私の静けさが怖くないのなら……もう少しだけ、そばにいてください。"
     ]
   },
   mantis: {
@@ -245,13 +298,13 @@ const STRONG_ENEMIES = [
 
 const AREA_DEFS = {
   asatsuyu: {
-    id: "asatsuyu", name: "朝露の森", recommend: "推奨Lv.3〜5", maxFloor: 5,
+    id: "asatsuyu", name: "朝露の森", recommend: "推奨Lv.3〜5", maxFloor: 5, cardImg: "./assets/fields/card_dew_forest.jpeg",
     feedChance: { normal: 0.24, strong: 0.48 },
     relicChance: { normal: 0.015, strong: 0.10, event: 0.40 },
     feedRareBoost: false
   },
   jueki: {
-    id: "jueki", name: "樹液の古木林", recommend: "推奨Lv.6〜10", maxFloor: 5,
+    id: "jueki", name: "樹液の古木林", recommend: "推奨Lv.6〜10", maxFloor: 5, cardImg: "./assets/fields/card_sap_oldwood.jpeg",
     feedChance: { normal: 0.30, strong: 0.55 },
     relicChance: { normal: 0.03, strong: 0.15, event: 0.55 },
     feedRareBoost: true
@@ -309,6 +362,7 @@ const OUTCOME_TEXT = {
 };
 
 let pendingType = null;
+let pendingVariant = null;
 let pendingModalAction = null;
 let currentEvent = null;
 let state = load();
@@ -316,6 +370,7 @@ let state = load();
 function defaultState() {
   return {
     resources: { honey: 30, sap: 16, pollen: 16 },
+    selectedAreaId: "asatsuyu",
     playerName: "ご主人様",
     currentQuote: "",
     active: null,
@@ -464,6 +519,7 @@ function giveExp(amount) {
   while (state.active.feedExp >= nextLevelExp()) {
     state.active.feedExp -= nextLevelExp();
     state.active.level += 1;
+      state.currentQuote = randomGirlQuote();
     leveled += 1;
   }
   updateBest();
@@ -532,17 +588,18 @@ function selectEgg(id) {
   savePlayerNameFromInput();
   pendingType = id;
   const t = typeDef(id);
+  pendingVariant = randomVariant(t.id);
   document.getElementById("eggScreen").classList.add("hidden");
   document.getElementById("nameScreen").classList.remove("hidden");
   document.getElementById("nameTitle").textContent = `${t.species}が孵りました`;
-  document.getElementById("namePreview").src = t.img;
+  document.getElementById("namePreview").src = pendingVariant.img || t.img;
   document.getElementById("nameInput").value = t.species;
 }
 function confirmName() {
   if (!pendingType) return;
   const t = typeDef(pendingType);
   const name = document.getElementById("nameInput").value.trim() || t.species;
-  const v = randomVariant(t.id);
+  const v = pendingVariant || randomVariant(t.id);
   state.active = {
     typeId: t.id, name,
     variantId: v.id, variantLabel: v.label, variantTrait: v.trait, variantImg: v.img,
@@ -556,6 +613,7 @@ function confirmName() {
   state.currentQuote = randomGirlQuote();
   addLog(`${name}が孵化しました。個体：${state.active.variantLabel}`);
   pendingType = null;
+  pendingVariant = null;
   document.getElementById("nameScreen").classList.add("hidden");
   save(true);
   render();
@@ -584,7 +642,7 @@ function rollFeed(source = "探索", strong = false) {
 }
 
 function currentArea() {
-  const id = state.run?.areaId || document.getElementById("areaSelect")?.value || "asatsuyu";
+  const id = state.run?.areaId || state.selectedAreaId || "asatsuyu";
   return AREA_DEFS[id] || AREA_DEFS.asatsuyu;
 }
 function areaRelics(areaId = currentArea().id) {
@@ -680,6 +738,12 @@ function unequip(hand) {
   save(true);
   render();
 }
+
+function startRunForArea(areaId) {
+  state.selectedAreaId = areaId || "asatsuyu";
+  startRun();
+}
+
 function startRun() {
   if (!state.active || state.battle || state.run) return;
   updateEnergy();
@@ -1011,14 +1075,20 @@ function quoteTierForLevel(level) {
   if (level >= 10) return "bond10";
   return "normal";
 }
+function quoteSetForActive() {
+  if (!state.active) return null;
+  if (state.active.variantId === "beetle_4" && GIRL_QUOTES.beetle_mysterious) {
+    return GIRL_QUOTES.beetle_mysterious;
+  }
+  return GIRL_QUOTES[state.active.typeId] || null;
+}
 function randomGirlQuote() {
   if (!state.active) return "";
-  const typeId = state.active.typeId;
   const tier = quoteTierForLevel(state.active.level || 1);
-  const set = GIRL_QUOTES[typeId] || {};
+  const set = quoteSetForActive() || {};
   const list = set[tier] || set.normal || [];
   const q = pick(list);
-  return formatGirlQuote(q, typeId);
+  return formatGirlQuote(q, state.active.typeId);
 }
 function speakGirl() {
   if (!state.active) return;
@@ -1054,25 +1124,20 @@ function renderGarden() {
   }
   const st = stats();
   if (!state.currentQuote) state.currentQuote = randomGirlQuote();
+  const tierName = quoteTierForLevel(state.active.level || 1) === "bond20" ? "好感度Lv.20+" : quoteTierForLevel(state.active.level || 1) === "bond10" ? "好感度Lv.10+" : "通常";
   box.innerHTML = `
-    <img id="talkGirlImg" src="${activeImage()}" alt="${state.active.name}">
+    <img src="${activeImage()}" alt="${state.active.name}">
     <div class="meta">
       <div class="cardTop"><h3>${state.active.name}</h3><span class="level">Lv.${state.active.level}</span></div>
+      <div class="speechBox">
+        <div class="speaker">${state.active.name} <span class="bondTier">${tierName}</span></div>
+        <div class="speechText">「${state.currentQuote}」</div>
+      </div>
       <div class="traitBox"><b>${activeType().trait.name}</b><div class="mini">${activeType().trait.desc}</div></div>
       <p class="stats">HP ${st.hp} / 防御 ${st.def} / ✊ ${st.rock} / ✌️ ${st.scissors} / ✋ ${st.paper}</p>
       <p class="growth">成長率：HP${stars5(activeType().growth.hp)} / 防御${stars5(activeType().growth.def)} / ✊${stars5(activeType().growth.rock)} / ✌️${stars5(activeType().growth.scissors)} / ✋${stars5(activeType().growth.paper)}</p>
       <p class="note">次のLvまで ${Math.max(0, nextLevelExp() - (state.active.feedExp || 0))} EXP</p>
-      <div class="speechBox">
-        <div class="speaker">${state.active.name} <span class="bondTier">${quoteTierForLevel(state.active.level || 1) === "bond20" ? "好感度Lv.20+" : quoteTierForLevel(state.active.level || 1) === "bond10" ? "好感度Lv.10+" : "通常"}</span></div>
-        <div class="speechText">「${state.currentQuote}」</div>
-        <div class="talkHint">画像タップ、またはボタンで話しかけられます。</div>
-      </div>
-      <button id="talkBtn" class="primary">話す</button>
     </div>`;
-  const talkBtn = document.getElementById("talkBtn");
-  if (talkBtn) talkBtn.onclick = speakGirl;
-  const img = document.getElementById("talkGirlImg");
-  if (img) img.onclick = speakGirl;
 }
 function renderGirlView() {
   const el = document.getElementById("girlCard");
@@ -1152,21 +1217,39 @@ function renderExplore() {
   updateEnergy();
   const energyBox = document.getElementById("energyBox");
   if (energyBox) energyBox.textContent = `探索力 ${state.energy.value} / ${ENERGY_MAX}　${nextEnergyText()}`;
-  const areaInfo = document.getElementById("areaInfo");
-  if (areaInfo) {
-    const area = currentArea();
-    areaInfo.textContent = `${area.name} / ${area.recommend} / 最大深度${area.maxFloor}`;
-  }
+  const areaCards = document.getElementById("areaCards");
   const explorePanel = document.getElementById("explorePanel");
   const battlePanel = document.getElementById("battlePanel");
-  const startBtn = document.getElementById("startExploreBtn");
-  if (!state.active) { startBtn.disabled = true; explorePanel.classList.add("hidden"); battlePanel.classList.add("hidden"); return; }
-  startBtn.disabled = !!state.run || state.energy.value <= 0;
-  if (!state.run) {
-    explorePanel.classList.add("hidden");
-    battlePanel.classList.add("hidden");
+
+  if (areaCards) {
+    const disabled = !state.active || !!state.run || state.energy.value <= 0;
+    areaCards.innerHTML = Object.values(AREA_DEFS).map(area => `
+      <article class="exploreImageCard ${disabled ? "disabled" : ""}" data-area="${area.id}" aria-label="${area.name}を探索する">
+        <img src="${area.cardImg}" alt="${area.name}">
+        <button class="areaCardHitbox" data-area="${area.id}" ${disabled ? "disabled" : ""}>探索する</button>
+      </article>
+    `).join("");
+    areaCards.querySelectorAll("[data-area]").forEach(el => {
+      el.onclick = (ev) => {
+        const areaId = el.dataset.area;
+        if (!areaId || disabled) return;
+        ev.preventDefault();
+        startRunForArea(areaId);
+      };
+    });
+  }
+
+  if (!state.active) {
+    if (explorePanel) explorePanel.classList.add("hidden");
+    if (battlePanel) battlePanel.classList.add("hidden");
     return;
   }
+  if (!state.run) {
+    if (explorePanel) explorePanel.classList.add("hidden");
+    if (battlePanel) battlePanel.classList.add("hidden");
+    return;
+  }
+
   document.getElementById("floorText").textContent = `${state.run.areaName || currentArea().name}　深度 ${state.run.floor} / ${state.run.maxFloor}`;
   document.getElementById("hpText").textContent = `HP ${Math.max(0, state.run.hp)} / ${state.run.maxHp}`;
   if (state.battle) {
@@ -1176,30 +1259,27 @@ function renderExplore() {
     document.getElementById("playerImg").src = activeImage();
     document.getElementById("playerName").textContent = state.active.name;
     document.getElementById("playerHpText").textContent = `HP ${Math.max(0, state.run.hp)} / ${state.run.maxHp}${state.run.poison ? "（毒）" : ""}`;
-    document.getElementById("playerHpBar").style.width = `${clamp((state.run.hp / state.run.maxHp) * 100, 0, 100)}%`;
-    document.getElementById("enemySprite").innerHTML = `<img src="${state.battle.enemy.img}" alt="${state.battle.enemy.name}">`;
-    document.getElementById("enemyName").textContent = state.battle.enemy.name;
-    document.getElementById("enemyHandText").innerHTML = `得意手：${handLabel(state.battle.enemy.hand)}${state.battle.enemyPoison ? " <span class=\"statusBadge\">毒</span>" : ""}${state.battle.enemyDefDown ? ` <span class=\"statusBadge\">防御-${state.battle.enemyDefDown}</span>` : ""}`;
-    document.getElementById("enemyHpText").textContent = `HP ${Math.max(0, state.battle.enemyHp)} / ${state.battle.enemy.hp}`;
-    document.getElementById("enemyHpBar").style.width = `${clamp((state.battle.enemyHp / state.battle.enemy.hp) * 100, 0, 100)}%`;
-    document.getElementById("battleText").textContent = state.battle.text;
-    document.getElementById("battleActions").innerHTML = `
-      <button data-battle="rock">${handLabel("rock")}で攻撃（威力 ${st.rock}）</button>
-      <button data-battle="scissors">${handLabel("scissors")}で攻撃（威力 ${st.scissors}）</button>
-      <button data-battle="paper">${handLabel("paper")}で攻撃（威力 ${st.paper}）</button>
-      <button data-battle="run">にげる</button>`;
-    document.querySelectorAll("[data-battle]").forEach(btn => {
-      btn.onclick = () => btn.dataset.battle === "run" ? escapeBattle() : battleAct(btn.dataset.battle);
-    });
-    return;
+    document.getElementById("playerHpBar").style.width = `${Math.max(0, state.run.hp) / state.run.maxHp * 100}%`;
+    const e = state.battle.enemy;
+    document.getElementById("enemySprite").innerHTML = `<img src="${e.img}" alt="${e.name}">`;
+    document.getElementById("enemyName").textContent = e.name;
+    document.getElementById("enemyHandText").textContent = `得意手：${handLabel(e.hand)}`;
+    document.getElementById("enemyHpText").textContent = `HP ${Math.max(0, state.battle.enemyHp)} / ${state.battle.enemyMaxHp}${state.battle.enemyPoison ? "（毒）" : ""}`;
+    document.getElementById("enemyHpBar").style.width = `${Math.max(0, state.battle.enemyHp) / state.battle.enemyMaxHp * 100}%`;
+    document.getElementById("battleText").textContent = state.battle.text || "敵と遭遇した。";
+    document.getElementById("battleActions").innerHTML = ["rock","scissors","paper"].map(h => `<button class="primary" data-hand="${h}">${handLabel(h)}</button>`).join("") + `<button class="secondary" id="escapeBtn">にげる</button>`;
+    document.querySelectorAll("[data-hand]").forEach(b => b.onclick = () => battleAct(b.dataset.hand));
+    document.getElementById("escapeBtn").onclick = escapeBattle;
+  } else {
+    battlePanel.classList.add("hidden");
+    explorePanel.classList.remove("hidden");
+    document.getElementById("eventTitle").textContent = state.run.eventTitle || "どこを探索する？";
+    document.getElementById("eventText").textContent = state.run.eventText || "行き先だけが分かります。何が起こるかは、踏み込んでからのお楽しみです。";
+    document.getElementById("choices").innerHTML = (state.run.choices || []).map((c,i) => `<button class="primary" data-choice="${i}">${c.label}</button>`).join("");
+    document.querySelectorAll("[data-choice]").forEach(b => b.onclick = () => chooseEvent(Number(b.dataset.choice)));
   }
-  battlePanel.classList.add("hidden");
-  explorePanel.classList.remove("hidden");
-  document.getElementById("eventTitle").textContent = currentEvent?.title || "探索";
-  document.getElementById("eventText").textContent = currentEvent?.text || "探索を開始してください。";
-  document.getElementById("choices").innerHTML = (currentEvent?.choices || []).map((p, i) => `<button data-choice="${i}">${p.label}</button>`).join("");
-  document.querySelectorAll("[data-choice]").forEach(btn => btn.onclick = () => resolvePlaceChoice(currentEvent.choices[Number(btn.dataset.choice)]));
 }
+
 function renderRecord() {
   document.getElementById("bestRecord").innerHTML = `
     <p>最高Lv：${state.best.level || 0}${state.best.name ? `（${state.best.name}）` : ""}</p>
@@ -1255,14 +1335,15 @@ function init() {
   initTabs();
   document.getElementById("saveBtn").onclick = () => { save(); render(); };
   document.getElementById("confirmNameBtn").onclick = confirmName;
-  document.getElementById("startExploreBtn").onclick = startRun;
+  const oldStartExploreBtn = document.getElementById("startExploreBtn");
+  if (oldStartExploreBtn) oldStartExploreBtn.onclick = startRun;
   document.getElementById("modalOkBtn").onclick = closeModal;
   document.getElementById("retireBtn").onclick = retireCurrent;
   document.getElementById("resetBtn").onclick = resetAll;
   const backToEggBtn = document.getElementById("backToEggBtn");
   if (backToEggBtn) backToEggBtn.onclick = backToEggSelect;
   const areaSelect = document.getElementById("areaSelect");
-  if (areaSelect) areaSelect.onchange = () => render();
+  if (areaSelect) areaSelect.onchange = () => { state.selectedAreaId = areaSelect.value; render(); };
   render();
   setInterval(renderExplore, 30000);
 }

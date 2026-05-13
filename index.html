@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#172217" />
-  <title>虫娘ローグガーデン v22</title>
+  <title>虫娘ローグガーデン v25</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="stylesheet" href="./style.css" />
 </head>
@@ -78,17 +78,10 @@
       </section>
 
       <section id="explore" class="view">
-        <div class="panel">
+        <div class="exploreCardsWrap">
           <h2>探索地</h2>
-          <div class="areaSelectBox">
-            <label for="areaSelect">行き先</label>
-            <select id="areaSelect" class="areaSelect">
-              <option value="asatsuyu">朝露の森（推奨Lv.3〜5）</option>
-              <option value="jueki">樹液の古木林（推奨Lv.6〜10）</option>
-            </select>
-          </div>
-          <p id="areaInfo" class="stats"></p>
-          <div id="energyBox" class="energyBox">探索力 3 / 3</div><button id="startExploreBtn" class="primary">探索開始</button>
+          <div id="energyBox" class="energyBox exploreEnergy">探索力 3 / 3</div>
+          <div id="areaCards" class="areaCards"></div>
         </div>
 
         <div id="explorePanel" class="panel hidden">
