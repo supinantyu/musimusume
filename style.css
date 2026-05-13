@@ -65,3 +65,17 @@ button,select,input{font:inherit}button{border:0;border-radius:14px;padding:12px
 .lostPanel{text-align:center;max-width:760px;margin:36px auto;padding:34px 24px}
 .lostPanel h1{font-size:34px;line-height:1.35;margin:0 0 22px;color:#f0e8d0}
 .lostSummary{white-space:pre-line;color:var(--muted);font-size:18px;line-height:1.8;margin-bottom:24px}
+
+.areaSelectBox{display:flex;gap:12px;align-items:center;margin:14px 0}
+.areaSelectBox label{color:var(--muted);font-weight:700}
+.areaSelect{flex:1;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#101b12;color:var(--text);font-weight:800;font-size:16px}
+.statusBadge{display:inline-block;padding:4px 9px;border:1px solid var(--line);border-radius:999px;margin-left:8px;color:var(--accent2);font-size:13px}
+
+.playerNameBox{display:grid;gap:8px;margin:12px 0 18px}
+.playerNameBox label{font-weight:900;color:var(--accent2)}
+.speechBox{margin-top:14px;padding:14px 16px;border-radius:18px;background:#101b12;border:1px solid var(--line);line-height:1.7}
+.speechBox .speaker{font-weight:900;color:var(--accent2);font-size:14px;margin-bottom:4px}
+.speechText{white-space:pre-line}
+.talkHint{font-size:12px;color:var(--muted);margin-top:8px}
+
+.bondTier{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:800}
