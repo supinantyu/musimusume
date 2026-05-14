@@ -1,4 +1,4 @@
-const CACHE_NAME="mushimusume-v32-yamato-icon-update";
+const CACHE_NAME="mushimusume-v33-save-export-import";
 const ASSETS=[
   "./README.md",
   "./app.js",

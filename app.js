@@ -400,6 +400,75 @@ function save(silent = false) {
   localStorage.setItem(SAVE_KEY, JSON.stringify(state));
   if (!silent) addLog("保存しました。");
 }
+function normalizeLoadedState(raw) {
+  const data = raw && raw.state ? raw.state : raw;
+  if (!data || typeof data !== "object") throw new Error("セーブデータの形式が正しくありません。");
+  const merged = { ...defaultState(), ...data };
+  merged.resources = { ...defaultState().resources, ...(data.resources || {}) };
+  merged.feeds = { ...defaultState().feeds, ...(data.feeds || {}) };
+  merged.equipped = { ...defaultState().equipped, ...(data.equipped || {}) };
+  merged.energy = data.energy || { value: ENERGY_MAX, updatedAt: Date.now() };
+  merged.best = { ...defaultState().best, ...(data.best || {}) };
+  merged.graves = Array.isArray(data.graves) ? data.graves : [];
+  merged.log = Array.isArray(data.log) ? data.log : ["セーブデータを読み込みました。"];
+  merged.relics = Array.isArray(data.relics) ? data.relics : [];
+  merged.active = data.active || null;
+  if (merged.active?.typeId && typeDef(merged.active.typeId)) {
+    const t = typeDef(merged.active.typeId);
+    merged.active.variantImg = t.img;
+    merged.active.variantId = `${t.id}_fixed`;
+    merged.active.variantLabel = "固定個体";
+    if (!merged.active.training) merged.active.training = { hp: 0, def: 0, rock: 0, scissors: 0, paper: 0 };
+  }
+  merged.run = data.run || null;
+  merged.battle = data.battle || null;
+  merged.lost = data.lost || null;
+  return merged;
+}
+function exportSaveData() {
+  save(true);
+  const payload = {
+    app: "虫娘ローグガーデン",
+    version: 33,
+    saveKey: SAVE_KEY,
+    exportedAt: new Date().toISOString(),
+    state
+  };
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const date = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+  a.href = url;
+  a.download = `mushimusume-save-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  const box = document.getElementById("importSaveText");
+  if (box) box.value = json;
+  modal("セーブを書き出しました", "JSONファイルを保存しました。念のため下の入力欄にも同じ内容を入れています。", "💾");
+}
+function importSaveFromText(text) {
+  try {
+    const parsed = JSON.parse(text);
+    const loaded = normalizeLoadedState(parsed);
+    if (!confirm("現在のセーブデータを、読み込んだデータで上書きしますか？")) return;
+    state = loaded;
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    addLog("セーブデータを読み込みました。");
+    modal("読み込み完了", "セーブデータを復元しました。", "💾", render);
+  } catch (e) {
+    modal("読み込み失敗", `セーブデータを読み込めませんでした。\n${e.message || e}`, "⚠️");
+  }
+}
+function importSaveFromFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => importSaveFromText(String(reader.result || ""));
+  reader.onerror = () => modal("読み込み失敗", "ファイルを読み込めませんでした。", "⚠️");
+  reader.readAsText(file);
+}
 function addLog(text) {
   state.log.unshift(text);
   state.log = state.log.slice(0, 120);
@@ -1325,6 +1394,12 @@ function initTabs() {
 function init() {
   initTabs();
   document.getElementById("saveBtn").onclick = () => { save(); render(); };
+  const exportSaveBtn = document.getElementById("exportSaveBtn");
+  if (exportSaveBtn) exportSaveBtn.onclick = exportSaveData;
+  const importSaveFile = document.getElementById("importSaveFile");
+  if (importSaveFile) importSaveFile.onchange = e => importSaveFromFile(e.target.files?.[0]);
+  const importSaveTextBtn = document.getElementById("importSaveTextBtn");
+  if (importSaveTextBtn) importSaveTextBtn.onclick = () => importSaveFromText(document.getElementById("importSaveText")?.value || "");
   document.getElementById("confirmNameBtn").onclick = confirmName;
   document.getElementById("startExploreBtn").onclick = startRun;
   document.getElementById("modalOkBtn").onclick = closeModal;

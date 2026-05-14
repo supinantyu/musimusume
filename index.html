@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#172217" />
-  <title>虫娘ローグガーデン v32</title>
+  <title>虫娘ローグガーデン v33</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="stylesheet" href="./style.css" />
 </head>
@@ -131,6 +131,18 @@
           <div id="graveList" class="logList"></div>
           <h3>冒険記録</h3>
           <div id="logList" class="logList"></div>
+
+          <h3>セーブデータ</h3>
+          <div class="saveTools">
+            <p class="stats">端末の更新やGitHub反映前に、セーブデータを書き出しておくと復元できます。</p>
+            <div class="saveToolButtons">
+              <button id="exportSaveBtn" class="ghost" type="button">セーブを書き出す</button>
+              <label class="fileImportLabel" for="importSaveFile">ファイルから読み込む</label>
+              <input id="importSaveFile" type="file" accept="application/json,.json" class="hiddenFile">
+            </div>
+            <textarea id="importSaveText" class="saveTextArea" placeholder="ここにセーブJSONを貼り付けて読み込むこともできます"></textarea>
+            <button id="importSaveTextBtn" class="ghost" type="button">貼り付けたセーブを読み込む</button>
+          </div>
           <button id="retireBtn" class="danger">現在の虫娘を引退させる</button>
           <button id="resetBtn" class="danger">全データリセット</button>
         </div>
