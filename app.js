@@ -1340,7 +1340,60 @@ function renderRelics() {
       equipRelic(item.uid, btn.dataset.hand);
     };
   });
-}function renderRecord() {
+}function renderExplore() {
+  updateEnergy();
+  const energyBox = document.getElementById("energyBox");
+  if (energyBox) energyBox.textContent = `探索力 ${state.energy.value} / ${ENERGY_MAX}　${nextEnergyText()}`;
+  const areaInfo = document.getElementById("areaInfo");
+  if (areaInfo) {
+    const area = currentArea();
+    areaInfo.textContent = `${area.name} / ${area.recommend} / 最大深度${area.maxFloor}`;
+  }
+  const explorePanel = document.getElementById("explorePanel");
+  const battlePanel = document.getElementById("battlePanel");
+  const startBtn = document.getElementById("startExploreBtn");
+  if (!state.active) { startBtn.disabled = true; explorePanel.classList.add("hidden"); battlePanel.classList.add("hidden"); return; }
+  startBtn.disabled = !!state.run || state.energy.value <= 0;
+  if (!state.run) {
+    explorePanel.classList.add("hidden");
+    battlePanel.classList.add("hidden");
+    return;
+  }
+  document.getElementById("floorText").textContent = `${state.run.areaName || currentArea().name}　深度 ${state.run.floor} / ${state.run.maxFloor}`;
+  document.getElementById("hpText").textContent = `HP ${Math.max(0, state.run.hp)} / ${state.run.maxHp}`;
+  if (state.battle) {
+    explorePanel.classList.add("hidden");
+    battlePanel.classList.remove("hidden");
+    const st = stats();
+    document.getElementById("playerImg").src = activeImage();
+    document.getElementById("playerName").textContent = state.active.name;
+    document.getElementById("playerHpText").textContent = `HP ${Math.max(0, state.run.hp)} / ${state.run.maxHp}${state.run.poison ? "（毒）" : ""}`;
+    document.getElementById("playerHpBar").style.width = `${clamp((state.run.hp / state.run.maxHp) * 100, 0, 100)}%`;
+    document.getElementById("enemySprite").innerHTML = `<img src="${state.battle.enemy.img}" alt="${state.battle.enemy.name}">`;
+    document.getElementById("enemyName").textContent = state.battle.enemy.name;
+    document.getElementById("enemyHandText").innerHTML = `得意手：${handLabel(state.battle.enemy.hand)}${state.battle.enemyPoison ? " <span class=\"statusBadge\">毒</span>" : ""}${state.battle.enemyDefDown ? ` <span class=\"statusBadge\">防御-${state.battle.enemyDefDown}</span>` : ""}`;
+    document.getElementById("enemyHpText").textContent = `HP ${Math.max(0, state.battle.enemyHp)} / ${state.battle.enemy.hp}`;
+    document.getElementById("enemyHpBar").style.width = `${clamp((state.battle.enemyHp / state.battle.enemy.hp) * 100, 0, 100)}%`;
+    document.getElementById("battleText").textContent = state.battle.text;
+    document.getElementById("battleActions").innerHTML = `
+      <button data-battle="rock">${handLabel("rock")}で攻撃（威力 ${st.rock}）</button>
+      <button data-battle="scissors">${handLabel("scissors")}で攻撃（威力 ${st.scissors}）</button>
+      <button data-battle="paper">${handLabel("paper")}で攻撃（威力 ${st.paper}）</button>
+      <button data-battle="run">にげる</button>`;
+    document.querySelectorAll("[data-battle]").forEach(btn => {
+      btn.onclick = () => btn.dataset.battle === "run" ? escapeBattle() : battleAct(btn.dataset.battle);
+    });
+    return;
+  }
+  battlePanel.classList.add("hidden");
+  explorePanel.classList.remove("hidden");
+  document.getElementById("eventTitle").textContent = currentEvent?.title || "探索";
+  document.getElementById("eventText").textContent = currentEvent?.text || "探索を開始してください。";
+  document.getElementById("choices").innerHTML = (currentEvent?.choices || []).map((p, i) => `<button data-choice="${i}">${p.label}</button>`).join("");
+  document.querySelectorAll("[data-choice]").forEach(btn => btn.onclick = () => resolvePlaceChoice(currentEvent.choices[Number(btn.dataset.choice)]));
+}
+
+function renderRecord() {
   document.getElementById("bestRecord").innerHTML = `
     <p>最高Lv：${state.best.level || 0}${state.best.name ? `（${state.best.name}）` : ""}</p>
     <p>最高深度：${state.best.depth || 0}</p>

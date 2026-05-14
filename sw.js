@@ -1,4 +1,4 @@
-const CACHE_NAME="mushimusume-v33-save-export-import";
+const CACHE_NAME="mushimusume-v34-explore-fix";
 const ASSETS=[
   "./README.md",
   "./app.js",
