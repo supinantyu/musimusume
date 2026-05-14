@@ -185,3 +185,13 @@ button,select,input{font:inherit}button{border:0;border-radius:14px;padding:12px
   font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size:12px;
 }
+
+/* v35: 形見アイコンは画像内の枠だけが見えるように表示 */
+.relicArt,
+.relicMiniArt{
+  background: transparent !important;
+  object-fit: contain;
+}
+.relicCompact{
+  overflow: hidden;
+}

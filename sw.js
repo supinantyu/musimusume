@@ -1,4 +1,4 @@
-const CACHE_NAME="mushimusume-v34-explore-fix";
+const CACHE_NAME="mushimusume-v35-relic-image-crop-fix";
 const ASSETS=[
   "./README.md",
   "./app.js",
