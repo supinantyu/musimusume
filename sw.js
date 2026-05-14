@@ -1,4 +1,4 @@
-const CACHE_NAME="mushimusume-v29-hatch-quote-layout-fix";
+const CACHE_NAME="mushimusume-v32-yamato-icon-update";
 const ASSETS=[
   "./README.md",
   "./app.js",
@@ -10,13 +10,19 @@ const ASSETS=[
   "./assets/characters/butterfly_2.png",
   "./assets/characters/butterfly_3.png",
   "./assets/characters/butterfly_4.png",
+  "./assets/characters/butterfly_fixed.jpeg",
   "./assets/characters/mantis_1.png",
   "./assets/characters/mantis_2.png",
   "./assets/characters/mantis_3.png",
   "./assets/characters/mantis_4.png",
+  "./assets/characters/mantis_fixed.jpeg",
+  "./assets/characters/redback_1.png",
+  "./assets/characters/redback_fixed.png",
+  "./assets/characters/yamato_kabuto_fixed.png",
   "./assets/eggs/beetle_egg.png",
   "./assets/eggs/butterfly_egg.png",
   "./assets/eggs/mantis_egg.png",
+  "./assets/eggs/redback_egg.png",
   "./assets/enemies/angry_hornet.png",
   "./assets/enemies/aphid_swarm.png",
   "./assets/enemies/jueki/bark_longhorn.png",
@@ -30,6 +36,7 @@ const ASSETS=[
   "./assets/enemies/rotten_centipede.png",
   "./assets/enemies/territorial_bee.png",
   "./assets/enemies/web_spider.png",
+  "./assets/icons/app-icon.png",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/relics/beetle_1.png",

@@ -11,12 +11,14 @@ const HANDS = {
 const COUNTER_HAND = { rock: "paper", scissors: "rock", paper: "scissors" };
 const GROWTH_LABELS = { hp: "HP", def: "防御", rock: "✊", scissors: "✌️", paper: "✋" };
 const TRAIN_CONFIG = {
-  hp: { material: "honey", materialLabel: "蜜", max: 20, label: "HP", bonus: n => n * 2 },
-  def: { material: "sap", materialLabel: "樹液", max: 10, label: "防御", bonus: n => Math.floor(n / 2) },
-  rock: { material: "pollen", materialLabel: "花粉", max: 10, label: "✊攻撃", bonus: n => Math.floor(n / 2) },
-  scissors: { material: "pollen", materialLabel: "花粉", max: 10, label: "✌️攻撃", bonus: n => Math.floor(n / 2) },
-  paper: { material: "pollen", materialLabel: "花粉", max: 10, label: "✋攻撃", bonus: n => Math.floor(n / 2) }
+  hp: { material: "honey", materialLabel: "蜜", label: "HP", divisor: 2, bonus: n => Math.floor(n / 2) },
+  def: { material: "sap", materialLabel: "樹液", label: "防御", divisor: 3, bonus: n => Math.floor(n / 3) },
+  rock: { material: "pollen", materialLabel: "花粉", label: "✊攻撃", divisor: 3, bonus: n => Math.floor(n / 3) },
+  scissors: { material: "pollen", materialLabel: "花粉", label: "✌️攻撃", divisor: 3, bonus: n => Math.floor(n / 3) },
+  paper: { material: "pollen", materialLabel: "花粉", label: "✋攻撃", divisor: 3, bonus: n => Math.floor(n / 3) }
 };
+const TRAIN_SUCCESS_RATE = 0.70;
+const TRAIN_LIMIT_PER_LEVEL = 3;
 const FEEDS = {
   unripe: { id: "unripe", name: "未熟フルーツ", stars: 1, exp: 8, icon: "🍏", desc: "朝露の森でよく見つかる青い果実。少しだけ成長経験値が入る。" },
   ripe: { id: "ripe", name: "完熟フルーツ", stars: 2, exp: 22, icon: "🍎", desc: "甘く熟した果実。食べさせるとしっかり成長する。" },
@@ -25,48 +27,48 @@ const FEEDS = {
 
 const VARIANTS = {
   butterfly: [
-    { id: "butterfly_1", label: "陽だまり個体", img: "./assets/characters/butterfly_1.png", trait: "草花の生息地背景つき。" },
-    { id: "butterfly_2", label: "鋭翅個体", img: "./assets/characters/butterfly_2.png", trait: "草原の生息地背景つき。" },
-    { id: "butterfly_3", label: "幽白個体", img: "./assets/characters/butterfly_3.png", trait: "野花の生息地背景つき。" },
-    { id: "butterfly_4", label: "月白個体", img: "./assets/characters/butterfly_4.png", trait: "穏やかな草地背景つき。" }
+    { id: "butterfly_fixed", label: "固定個体", img: "./assets/characters/butterfly_fixed.jpeg", trait: "固定立ち絵。" }
   ],
   beetle: [
-    { id: "beetle_1", label: "長角個体", img: "./assets/characters/beetle_1.png", trait: "樹液の森背景つき。" },
-    { id: "beetle_2", label: "双房個体", img: "./assets/characters/beetle_2.png", trait: "明るい雑木林背景つき。" },
-    { id: "beetle_3", label: "片影個体", img: "./assets/characters/beetle_3.png", trait: "深い森背景つき。" },
-    { id: "beetle_4", label: "眠角個体", img: "./assets/characters/beetle_4.png", trait: "静かな林床背景つき。" }
+    { id: "yamato_kabuto_fixed", label: "固定個体", img: "./assets/characters/yamato_kabuto_fixed.png", trait: "固定立ち絵。" }
   ],
   mantis: [
-    { id: "mantis_1", label: "荒刃個体", img: "./assets/characters/mantis_1.png", trait: "緑の草むら背景つき。" },
-    { id: "mantis_2", label: "疾風個体", img: "./assets/characters/mantis_2.png", trait: "明るい草地背景つき。" },
-    { id: "mantis_3", label: "双角個体", img: "./assets/characters/mantis_3.png", trait: "濃い下草背景つき。" },
-    { id: "mantis_4", label: "枯葉個体", img: "./assets/characters/mantis_4.png", trait: "枯草と落ち葉の背景つき。" }
+    { id: "mantis_fixed", label: "固定個体", img: "./assets/characters/mantis_fixed.jpeg", trait: "固定立ち絵。" }
+  ],
+  redback: [
+    { id: "redback_fixed", label: "固定個体", img: "./assets/characters/redback_fixed.png", trait: "固定立ち絵。" }
   ]
 };
 const TYPES = [
   {
-    id: "butterfly", species: "モンシロチョウ娘", role: "回復・パー成長", img: "./assets/characters/butterfly_1.png", eggImg: "./assets/eggs/butterfly_egg.png",
+    id: "butterfly", species: "モンシロチョウ娘", role: "回復・パー成長", img: "./assets/characters/butterfly_fixed.jpeg", eggImg: "./assets/eggs/butterfly_egg.png",
     desc: "おとなしい白い蝶娘。HPとパー攻撃が伸びやすい。",
     base: { hp: 34, def: 3, rock: 7, scissors: 7, paper: 9 },
     growth: { hp: 3, def: 2, rock: 2, scissors: 2, paper: 3 },
     trait: { name: "白愛の翅", desc: "探索中一回だけ、戦闘時に『にげる』を選ぶとHPを小回復する。", escapeHealRate: 0.12 }
   },
   {
-    id: "beetle", species: "カブトムシ娘", role: "耐久・パー成長", img: "./assets/characters/beetle_1.png", eggImg: "./assets/eggs/beetle_egg.png",
-    desc: "頼れる甲虫娘。HP・防御・パー攻撃が伸びやすい。",
+    id: "beetle", species: "ヤマトカブト娘", role: "耐久・パー成長", img: "./assets/characters/yamato_kabuto_fixed.png", eggImg: "./assets/eggs/beetle_egg.png",
+    desc: "静かな甲虫娘。HP・防御・パー攻撃が伸びやすい。",
     base: { hp: 44, def: 5, rock: 7, scissors: 7, paper: 10 },
     growth: { hp: 3, def: 3, rock: 2, scissors: 2, paper: 4 },
     trait: { name: "兜の誇り", desc: "✌️技を受けた時のダメージが少し多くなる。", scissorsTakenMult: 1.2 }
   },
   {
-    id: "mantis", species: "カマキリ娘", role: "攻撃・チョキ成長", img: "./assets/characters/mantis_1.png", eggImg: "./assets/eggs/mantis_egg.png",
+    id: "mantis", species: "オオカマキリ娘", role: "攻撃・チョキ成長", img: "./assets/characters/mantis_fixed.jpeg", eggImg: "./assets/eggs/mantis_egg.png",
     desc: "緑髪の戦闘的な虫娘。チョキ攻撃が特に伸びやすい。",
     base: { hp: 30, def: 3, rock: 9, scissors: 11, paper: 8 },
     growth: { hp: 2, def: 2, rock: 3, scissors: 4, paper: 3 },
     trait: { name: "暴食", desc: "レベルアップに必要な経験値が少し多い。", expCostMult: 1.2 }
+  },
+  {
+    id: "redback", species: "セアカゴケグモ娘", role: "毒・チョキ寄り", img: "./assets/characters/redback_fixed.png", eggImg: "./assets/eggs/redback_egg.png",
+    desc: "静かなヤンデレ気質の蜘蛛娘。チョキがやや伸びやすく、毒でじわじわ追い詰める。",
+    base: { hp: 34, def: 3, rock: 8, scissors: 9, paper: 8 },
+    growth: { hp: 2, def: 2, rock: 2, scissors: 3, paper: 2 },
+    trait: { name: "猛毒", desc: "✌️勝利時、30%で敵を毒にする。自分が与える毒ダメージは最大HPの1/8。", poisonDamageDivisor: 8, poisonOnWinChance: 0.3, poisonHands: ["scissors"] }
   }
 ];
-
 
 const GIRL_QUOTES = {
   butterfly: {
@@ -226,6 +228,58 @@ const GIRL_QUOTES = {
       "負けそうな時ほど燃える。でも、今は死にたくない。まだ一緒に行きたいから。",
       "{player}、あたしのこと信じて。あたしも、ちゃんと信じてるから。",
       "帰ったらご飯。あと、少しだけ話そうよ。……まだ一緒にいたいし。"
+    ]  },
+  redback: {
+    normal: [
+      "……{player}、ちゃんとこっち見て。よそ見、嫌いだから。",
+      "わたし、静かな場所が好き。……でも{player}といるなら、少しくらいうるさくてもいい。",
+      "その敵、わたしが絡め取る。逃がさないよ。",
+      "{player}、離れないで。糸、つけときたいくらい。",
+      "大丈夫。すぐには殺さないから。じわじわ弱るの、見てたいし。",
+      "……ふふ。こわい？ なら、もっと近くにいればいいのに。",
+      "わたし、待つのは得意。獲物も、{player}の言葉も。",
+      "黒い糸って、落ち着くんだ。ぐちゃぐちゃな気持ちを、きれいに縛ってくれるから。",
+      "敵を見る目と、{player}を見る目？ ……少し違うよ。かなり。",
+      "今日は誰を毒にしようか。……もちろん、敵だけね。今のところは。",
+      "わたし、おしゃべりじゃないけど……{player}の声は、ちゃんと聞いてる。",
+      "逃げ道を残すの、好きじゃない。囲ってしまえば安心でしょ。",
+      "その顔、覚えておく。{player}が困ってる顔、嫌いじゃないから。",
+      "近づいてきたら噛むよ。……敵の話。{player}は別。",
+      "わたしのそば、けっこう安全だよ。……敵にとっては最悪だけど。"
+    ],
+    bond10: [
+      "{player}、最近ちょっと油断してる。わたしがいるからって、安心しすぎ。",
+      "わたしの毒、前よりよく回る。……{player}と一緒だと、気分がいいからかな。",
+      "糸が絡まるみたいに、{player}のこと、気づいたらずっと考えてる。",
+      "敵を見つけるより先に、{player}の気配が分かる。変なの。",
+      "ねえ{player}、勝ったら少しくらい褒めて。……黙ってうなずくだけでもいいから。",
+      "わたし、執着強いってよく言われる。……いまさら直す気もないけど。",
+      "{player}が傷つくと、胸のあたりがざわざわする。あれ、かなり不快。",
+      "静かにしてると、みんな油断する。そういうの、嫌いじゃないよ。",
+      "わたしの糸で守れたらいいのにね。……きつく巻きすぎるかもしれないけど。",
+      "{player}は優しいね。だから、わたしがちゃんと汚いところも受け持ってあげる。",
+      "敵が逃げるの、気に入らない。{player}が逃げないなら、それでいいけど。",
+      "わたし、ひとりでも戦える。でも、{player}といる方がずっといい。",
+      "今日は何も起きないといいね。……{player}と長く一緒にいられるから。",
+      "その呼び方、好き。もっと呼んで。……わたしの名前。",
+      "糸みたいに細くても、切れないものってあるんだね。たぶん、今のこれ。"
+    ],
+    bond20: [
+      "{player}、もう逃がさないよ。……冗談半分、本気半分。",
+      "わたしの巣は、{player}が帰ってくる場所にしたい。ほかは、どうでもいい。",
+      "誰にも渡したくないって思うの、だめかな。……だめでも、やめないけど。",
+      "{player}が笑うと、わたしまで少しだけほどける。そういうの、ずるい。",
+      "毒って便利だよ。すぐ終わらせないで、ちゃんと相手を止めてくれるから。……わたしたちの時間みたいに。",
+      "わたし、優しい子じゃないよ。でも{player}には、できるだけやさしくしたい。",
+      "どこに行っても見つける。糸がなくても、気配だけで分かるから。",
+      "{player}が無事なら、少しくらい汚れてもいい。噛みついてでも守る。",
+      "ずっと一緒にいるって、口で言うのは簡単。だから、わたしは行動で縛るね。",
+      "ねえ{player}、わたしのこと、ちゃんと選び続けて。選ばせ続けるから。",
+      "この毒も、この糸も、この気持ちも……全部、もう{player}の近くに置いてる。",
+      "敵がどれだけ強くても、{player}を傷つけるなら嫌い。すごく、嫌い。",
+      "わたしの静けさ、{player}の隣だと少しだけやわらぐ。……特別ってこと。",
+      "噛み跡みたいに、消えないものを残したい。思い出でも、約束でも。",
+      "帰ろう、{player}。わたしのそばに。……そこが一番、落ち着くから。"
     ]
   }
 };
@@ -358,14 +412,17 @@ function stars3(n) { return "⭐️".repeat(n); }
 function feedStars(feed) { return "★".repeat(feed.stars) + "☆".repeat(3 - feed.stars); }
 function typeDef(id) { return TYPES.find(t => t.id === id); }
 function activeType() { return state.active ? typeDef(state.active.typeId) : null; }
-function activeImage() { return state.active?.variantImg || activeType()?.img || "./assets/characters/butterfly_1.png"; }
+function activeImage() { return activeType()?.img || state.active?.variantImg || "./assets/characters/butterfly_fixed.jpeg"; }
 function handLabel(hand) { return `${HANDS[hand].icon} ${HANDS[hand].label}`; }
 function handResult(a, b) { return a === b ? "draw" : HANDS[a].beats === b ? "win" : "lose"; }
 function relicByUid(id) { return state.relics.find(r => r.uid === id); }
 function equippedRelic(hand) { return relicByUid(state.equipped[hand]); }
+function fixedVariant(typeId) {
+  const t = typeDef(typeId);
+  return { id: `${typeId}_fixed`, label: "固定個体", img: t?.img || "./assets/characters/butterfly_fixed.jpeg", trait: "固定立ち絵。" };
+}
 function randomVariant(typeId) {
-  const list = VARIANTS[typeId] || [];
-  return pick(list) || { id: `${typeId}_1`, label: "標準個体", img: `./assets/characters/${typeId}_1.png`, trait: "標準的な個体。" };
+  return fixedVariant(typeId);
 }
 function ensureFeeds() {
   if (!state.feeds) state.feeds = { unripe: 0, ripe: 0, super: 0 };
@@ -400,11 +457,17 @@ function consumeEnergy() {
   if (state.energy.value < ENERGY_MAX) state.energy.updatedAt = Date.now();
   return true;
 }
+function trainSuccessLimit() {
+  if (!state.active) return 0;
+  return Math.max(0, (state.active.level || 1) * TRAIN_LIMIT_PER_LEVEL);
+}
 function trainCostForCount(count) {
   const next = count + 1;
   if (next <= 5) return 10;
   if (next <= 10) return 15;
-  return 20;
+  if (next <= 20) return 20;
+  if (next <= 40) return 30;
+  return 50;
 }
 function statValue(base, growthStar, level, trained, kind) {
   const l = Math.max(0, level - 1);
@@ -508,8 +571,9 @@ function trainStat(stat) {
   const conf = TRAIN_CONFIG[stat];
   const tr = state.active.training || { hp: 0, def: 0, rock: 0, scissors: 0, paper: 0 };
   const count = tr[stat] || 0;
-  if (count >= conf.max) {
-    modal("訓練上限", `${conf.label}訓練は上限です。`, "🌱");
+  const limit = trainSuccessLimit();
+  if (count >= limit) {
+    modal("訓練上限", `${conf.label}訓練は現在Lv.${state.active.level}では成功${limit}回までです。レベルアップで上限が増えます。`, "🌱");
     return;
   }
   const cost = trainCostForCount(count);
@@ -519,8 +583,18 @@ function trainStat(stat) {
   }
   state.resources[conf.material] -= cost;
   state.active.training = tr;
-  state.active.training[stat] = count + 1;
-  addLog(`${state.active.name}の${conf.label}を訓練しました。${conf.materialLabel}-${cost}`);
+  if (Math.random() < TRAIN_SUCCESS_RATE) {
+    state.active.training[stat] = count + 1;
+    addLog(`${state.active.name}の${conf.label}訓練に成功しました。${conf.materialLabel}-${cost}`);
+    modal("訓練成功", `${state.active.name}の${conf.label}訓練に成功しました。
+成功回数 ${count + 1}/${limit}
+${conf.materialLabel}-${cost}`, "✨", render);
+  } else {
+    addLog(`${state.active.name}の${conf.label}訓練は失敗しました。${conf.materialLabel}-${cost}`);
+    modal("訓練失敗", `集中が切れてしまいました。
+素材は消費しましたが、成功回数は増えません。
+${conf.materialLabel}-${cost}`, "…", render);
+  }
   save(true);
   render();
 }
@@ -534,21 +608,21 @@ function selectEgg(id) {
   savePlayerNameFromInput();
   pendingType = id;
   const t = typeDef(id);
-  pendingVariant = randomVariant(t.id);
+  pendingVariant = fixedVariant(t.id);
   document.getElementById("eggScreen").classList.add("hidden");
   document.getElementById("nameScreen").classList.remove("hidden");
   document.getElementById("nameTitle").textContent = `${t.species}が孵りました`;
-  document.getElementById("namePreview").src = pendingVariant.img || t.img;
+  document.getElementById("namePreview").src = t.img;
   document.getElementById("nameInput").value = t.species;
 }
 function confirmName() {
   if (!pendingType) return;
   const t = typeDef(pendingType);
   const name = document.getElementById("nameInput").value.trim() || t.species;
-  const v = pendingVariant || randomVariant(t.id);
+  const v = fixedVariant(t.id);
   state.active = {
     typeId: t.id, name,
-    variantId: v.id, variantLabel: v.label, variantTrait: v.trait, variantImg: v.img,
+    variantId: v.id, variantLabel: v.label, variantTrait: v.trait, variantImg: t.img,
     level: 1, feedExp: 0, wins: 0, maxDepth: 0,
     training: { hp: 0, def: 0, rock: 0, scissors: 0, paper: 0 }
   };
@@ -557,7 +631,7 @@ function confirmName() {
   state.run = null;
   state.battle = null;
   state.currentQuote = randomGirlQuote();
-  addLog(`${name}が孵化しました。個体：${state.active.variantLabel}`);
+  addLog(`${name}が孵化しました。`);
   pendingType = null;
   pendingVariant = null;
   document.getElementById("nameScreen").classList.add("hidden");
@@ -631,7 +705,8 @@ function applyPoisonDamageToPlayer(messages) {
 }
 function applyPoisonDamageToEnemy(messages) {
   if (!state.battle?.enemyPoison) return;
-  const dmg = Math.max(1, Math.ceil(state.battle.enemy.hp / 16));
+  const divisor = activeType()?.trait?.poisonDamageDivisor || 16;
+  const dmg = Math.max(1, Math.ceil(state.battle.enemy.hp / divisor));
   state.battle.enemyHp -= dmg;
   messages.push(`${state.battle.enemy.name}は毒で${dmg}ダメージ。`);
 }
@@ -886,6 +961,14 @@ function battleAct(hand) {
   const relicInfo = applyRelicEffect(hand, result, incoming);
   incoming = relicInfo.incomingDamage;
   dealt += relicInfo.bonusDamage;
+  const trait = activeType().trait || {};
+  if (result === "win" && dealt > 0 && trait.poisonOnWinChance && !state.battle.enemyPoison) {
+    const poisonHands = trait.poisonHands || ["rock", "scissors", "paper"];
+    if (poisonHands.includes(hand) && Math.random() < trait.poisonOnWinChance) {
+      state.battle.enemyPoison = true;
+      messages.push(`${state.active.name}の猛毒が回り、${enemy.name}を毒にした。`);
+    }
+  }
   if (dealt > 0) state.battle.enemyHp -= dealt;
   if (incoming > 0 && enemy.poisonChance && Math.random() < enemy.poisonChance && !state.run.poison) {
     state.run.poison = true;
@@ -1005,6 +1088,7 @@ function savePlayerNameFromInput() {
 function quotePlayerName(typeId) {
   const raw = state.playerName || "ご主人様";
   if (typeId === "butterfly") return `${raw}さん`;
+  if (typeId === "redback") return raw === "ご主人様" ? raw : `${raw}ちゃん`;
   return raw;
 }
 function formatGirlQuote(q, typeId) {
@@ -1081,7 +1165,7 @@ function renderGirlView() {
     <article class="card">
       <img src="${activeImage()}" alt="${state.active.name}">
       <div class="cardTop"><h3>${state.active.name}</h3><span class="level">Lv.${state.active.level}</span></div>
-      <p class="stats">${t.species} / ${state.active.variantLabel}<br>${t.desc}</p>
+      <p class="stats">${t.species}<br>${t.desc}</p>
       <div class="traitBox"><b>${t.trait.name}</b><div class="mini">${t.trait.desc}</div></div>
       <p class="growth">成長率：HP${stars5(t.growth.hp)} / 防御${stars5(t.growth.def)} / ✊${stars5(t.growth.rock)} / ✌️${stars5(t.growth.scissors)} / ✋${stars5(t.growth.paper)}</p>
       <p class="stats">HP ${st.hp} / 防御 ${st.def} / ✊ ${st.rock} / ✌️ ${st.scissors} / ✋ ${st.paper}</p>
@@ -1097,14 +1181,40 @@ function renderGirlView() {
         <p class="stats">蜜＝HP、樹液＝防御、花粉＝✊✌️✋攻撃。上昇量はレベル成長より小さく、上限があります。</p>
         <div class="trainGrid">
           ${Object.keys(TRAIN_CONFIG).map(k => {
-            const c = TRAIN_CONFIG[k], count = tr[k] || 0, cost = count >= c.max ? "上限" : `${c.materialLabel}${trainCostForCount(count)}`;
-            return `<button data-train="${k}">${c.label}<br>${count}/${c.max} / ${cost}</button>`;
+            const c = TRAIN_CONFIG[k], count = tr[k] || 0, limit = trainSuccessLimit();
+            const cost = count >= limit ? "Lv上限" : `${c.materialLabel}${trainCostForCount(count)}`;
+            const bonus = c.bonus ? c.bonus(count) : 0;
+            return `<button data-train="${k}">${c.label}<br>成功:${count}/${limit} / +${bonus}<br>${cost}</button>`;
           }).join("")}
         </div>
       </div>
     </article>`;
   el.querySelectorAll("[data-feed]").forEach(btn => btn.onclick = () => useFeed(btn.dataset.feed));
   el.querySelectorAll("[data-train]").forEach(btn => btn.onclick = () => trainStat(btn.dataset.train));
+}
+
+function relicGroupKey(r) {
+  return `${r.defId || r.name}_${r.stars}_${r.hand}_${r.multiplier}`;
+}
+function groupedRelics() {
+  const groups = {};
+  (state.relics || []).forEach(r => {
+    const key = relicGroupKey(r);
+    if (!groups[key]) groups[key] = { sample: r, items: [], equippedHands: [] };
+    groups[key].items.push(r);
+  });
+  for (const [hand, uid] of Object.entries(state.equipped || {})) {
+    const r = relicByUid(uid);
+    if (r) {
+      const key = relicGroupKey(r);
+      if (groups[key]) groups[key].equippedHands.push(hand);
+    }
+  }
+  return Object.values(groups).sort((a, b) => {
+    const ah = a.sample.hand === "all" ? "z" : a.sample.hand;
+    const bh = b.sample.hand === "all" ? "z" : b.sample.hand;
+    return ah.localeCompare(bh) || a.sample.name.localeCompare(b.sample.name) || b.sample.stars - a.sample.stars;
+  });
 }
 function renderRelics() {
   const slots = document.getElementById("equipSlots");
@@ -1122,82 +1232,46 @@ function renderRelics() {
     slots.appendChild(div);
   });
   slots.querySelectorAll("[data-unequip]").forEach(btn => btn.onclick = () => unequip(btn.dataset.unequip));
+
   const list = document.getElementById("relicList");
-  list.innerHTML = "";
-  if (state.relics.length === 0) {
-    list.innerHTML = `<div class="panel"><h3>形見なし</h3><p>探索で、かなり低確率で入手できます。</p></div>`;
+  const groups = groupedRelics();
+  if (!groups.length) {
+    list.innerHTML = `<p class="stats">形見はまだありません。</p>`;
     return;
   }
-  state.relics.slice().reverse().forEach(r => {
-    const equipped = ["rock","scissors","paper"].some(h => state.equipped[h] === r.uid);
-    const card = document.createElement("article");
-    card.className = "card relicCard" + (equipped ? " equipped" : "");
-    const buttons = r.hand === "all"
-      ? ["rock","scissors","paper"].map(h => `<button data-equip="${r.uid}" data-hand="${h}">${handLabel(h)}へ装備</button>`).join("")
-      : `<button data-equip="${r.uid}" data-hand="${r.hand}">${equipped ? "装備中" : `${handLabel(r.hand)}へ装備`}</button>`;
-    card.innerHTML = `
-      <img class="relicArt" src="${r.icon}" alt="${r.name}">
-      <div class="cardTop"><h3>${r.name}</h3><span class="rarity">${stars3(r.stars)}</span></div>
-      <p><span class="handBadge">装備手：${r.hand === "all" ? "✊✌️✋ どれでも" : handLabel(r.hand)}</span></p>
-      <p class="stats relicEffect">${r.desc || r.effectText}</p>
-      ${buttons}`;
-    list.appendChild(card);
+
+  list.innerHTML = groups.map((g, idx) => {
+    const r = g.sample;
+    const equippedText = g.equippedHands.length ? `装備中：${g.equippedHands.map(handLabel).join(" / ")}` : "";
+    const availableItems = g.items.filter(item => !Object.values(state.equipped || {}).includes(item.uid));
+    const equipButtons = r.hand === "all"
+      ? ["rock","scissors","paper"].map(h => `<button data-equip-group="${idx}" data-hand="${h}" ${!availableItems.length ? "disabled" : ""}>${handLabel(h)}に装備</button>`).join("")
+      : `<button data-equip-group="${idx}" data-hand="${r.hand}" ${!availableItems.length ? "disabled" : ""}>${handLabel(r.hand)}に装備</button>`;
+    return `
+      <article class="relicCompact">
+        <img class="relicMiniArt" src="${r.icon}" alt="${r.name}">
+        <div class="relicCompactBody">
+          <div class="relicCompactTop">
+            <b>${r.name}</b>
+            <span>${stars3(r.stars)} ×${g.items.length}</span>
+          </div>
+          <p class="stats">${r.desc}</p>
+          ${equippedText ? `<div class="equippedBadge">${equippedText}</div>` : ""}
+          <div class="equipButtons">${equipButtons}</div>
+        </div>
+      </article>`;
+  }).join("");
+
+  list.querySelectorAll("[data-equip-group]").forEach(btn => {
+    btn.onclick = () => {
+      const group = groups[Number(btn.dataset.equipGroup)];
+      if (!group) return;
+      const availableItems = group.items.filter(item => !Object.values(state.equipped || {}).includes(item.uid));
+      const item = availableItems[0] || group.items[0];
+      equipRelic(item.uid, btn.dataset.hand);
+    };
   });
-  list.querySelectorAll("[data-equip]").forEach(btn => btn.onclick = () => equipRelic(btn.dataset.equip, btn.dataset.hand));
-}
-function renderExplore() {
-  updateEnergy();
-  const energyBox = document.getElementById("energyBox");
-  if (energyBox) energyBox.textContent = `探索力 ${state.energy.value} / ${ENERGY_MAX}　${nextEnergyText()}`;
-  const areaInfo = document.getElementById("areaInfo");
-  if (areaInfo) {
-    const area = currentArea();
-    areaInfo.textContent = `${area.name} / ${area.recommend} / 最大深度${area.maxFloor}`;
-  }
-  const explorePanel = document.getElementById("explorePanel");
-  const battlePanel = document.getElementById("battlePanel");
-  const startBtn = document.getElementById("startExploreBtn");
-  if (!state.active) { startBtn.disabled = true; explorePanel.classList.add("hidden"); battlePanel.classList.add("hidden"); return; }
-  startBtn.disabled = !!state.run || state.energy.value <= 0;
-  if (!state.run) {
-    explorePanel.classList.add("hidden");
-    battlePanel.classList.add("hidden");
-    return;
-  }
-  document.getElementById("floorText").textContent = `${state.run.areaName || currentArea().name}　深度 ${state.run.floor} / ${state.run.maxFloor}`;
-  document.getElementById("hpText").textContent = `HP ${Math.max(0, state.run.hp)} / ${state.run.maxHp}`;
-  if (state.battle) {
-    explorePanel.classList.add("hidden");
-    battlePanel.classList.remove("hidden");
-    const st = stats();
-    document.getElementById("playerImg").src = activeImage();
-    document.getElementById("playerName").textContent = state.active.name;
-    document.getElementById("playerHpText").textContent = `HP ${Math.max(0, state.run.hp)} / ${state.run.maxHp}${state.run.poison ? "（毒）" : ""}`;
-    document.getElementById("playerHpBar").style.width = `${clamp((state.run.hp / state.run.maxHp) * 100, 0, 100)}%`;
-    document.getElementById("enemySprite").innerHTML = `<img src="${state.battle.enemy.img}" alt="${state.battle.enemy.name}">`;
-    document.getElementById("enemyName").textContent = state.battle.enemy.name;
-    document.getElementById("enemyHandText").innerHTML = `得意手：${handLabel(state.battle.enemy.hand)}${state.battle.enemyPoison ? " <span class=\"statusBadge\">毒</span>" : ""}${state.battle.enemyDefDown ? ` <span class=\"statusBadge\">防御-${state.battle.enemyDefDown}</span>` : ""}`;
-    document.getElementById("enemyHpText").textContent = `HP ${Math.max(0, state.battle.enemyHp)} / ${state.battle.enemy.hp}`;
-    document.getElementById("enemyHpBar").style.width = `${clamp((state.battle.enemyHp / state.battle.enemy.hp) * 100, 0, 100)}%`;
-    document.getElementById("battleText").textContent = state.battle.text;
-    document.getElementById("battleActions").innerHTML = `
-      <button data-battle="rock">${handLabel("rock")}で攻撃（威力 ${st.rock}）</button>
-      <button data-battle="scissors">${handLabel("scissors")}で攻撃（威力 ${st.scissors}）</button>
-      <button data-battle="paper">${handLabel("paper")}で攻撃（威力 ${st.paper}）</button>
-      <button data-battle="run">にげる</button>`;
-    document.querySelectorAll("[data-battle]").forEach(btn => {
-      btn.onclick = () => btn.dataset.battle === "run" ? escapeBattle() : battleAct(btn.dataset.battle);
-    });
-    return;
-  }
-  battlePanel.classList.add("hidden");
-  explorePanel.classList.remove("hidden");
-  document.getElementById("eventTitle").textContent = currentEvent?.title || "探索";
-  document.getElementById("eventText").textContent = currentEvent?.text || "探索を開始してください。";
-  document.getElementById("choices").innerHTML = (currentEvent?.choices || []).map((p, i) => `<button data-choice="${i}">${p.label}</button>`).join("");
-  document.querySelectorAll("[data-choice]").forEach(btn => btn.onclick = () => resolvePlaceChoice(currentEvent.choices[Number(btn.dataset.choice)]));
-}
-function renderRecord() {
+}function renderRecord() {
   document.getElementById("bestRecord").innerHTML = `
     <p>最高Lv：${state.best.level || 0}${state.best.name ? `（${state.best.name}）` : ""}</p>
     <p>最高深度：${state.best.depth || 0}</p>

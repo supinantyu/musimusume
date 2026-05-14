@@ -94,3 +94,52 @@ button,select,input{font:inherit}button{border:0;border-radius:14px;padding:12px
 .bondTier{
   display:none !important;
 }
+
+.relicCompact{
+  display:grid;
+  grid-template-columns:76px 1fr;
+  gap:12px;
+  align-items:center;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:rgba(255,255,255,.045);
+  margin:10px 0;
+}
+.relicMiniArt{
+  width:72px;
+  height:72px;
+  object-fit:contain;
+  border-radius:14px;
+  background:transparent;
+}
+.relicCompactTop{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  font-weight:900;
+}
+.equippedBadge{
+  display:inline-block;
+  margin:4px 0 8px;
+  padding:3px 8px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  font-size:12px;
+  color:var(--accent2);
+  font-weight:900;
+}
+.equipButtons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.equipButtons button{
+  padding:8px 10px;
+  border-radius:12px;
+}
+@media (max-width:520px){
+  .relicCompact{grid-template-columns:64px 1fr;padding:10px}
+  .relicMiniArt{width:60px;height:60px}
+}
