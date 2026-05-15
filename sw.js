@@ -1,4 +1,4 @@
-const CACHE_NAME="mushimusume-v35-relic-image-crop-fix";
+const CACHE_NAME="mushimusume-v38-relics-unified";
 const ASSETS=[
   "./README.md",
   "./app.js",
@@ -52,6 +52,15 @@ const ASSETS=[
   "./assets/relics/jueki/poison_scales_1.png",
   "./assets/relics/jueki/poison_scales_2.png",
   "./assets/relics/jueki/poison_scales_3.png",
+  "./assets/relics/mantis_1.png",
+  "./assets/relics/mantis_2.png",
+  "./assets/relics/mantis_3.png",
+  "./assets/relics/beetle_1.png",
+  "./assets/relics/beetle_2.png",
+  "./assets/relics/beetle_3.png",
+  "./assets/relics/cicada_1.png",
+  "./assets/relics/cicada_2.png",
+  "./assets/relics/cicada_3.png",
   "./assets/relics/mantis_1.png",
   "./assets/relics/mantis_2.png",
   "./assets/relics/mantis_3.png",

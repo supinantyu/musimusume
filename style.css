@@ -195,3 +195,14 @@ button,select,input{font:inherit}button{border:0;border-radius:14px;padding:12px
 .relicCompact{
   overflow: hidden;
 }
+
+/* v36: 形見アイコンを新ファイル名にしてホーム画面PWAの古い画像キャッシュを回避 */
+.relicArt,
+.relicMiniArt{
+  background: transparent !important;
+  object-fit: contain !important;
+}
+.relicMiniArt{
+  width:72px !important;
+  height:72px !important;
+}

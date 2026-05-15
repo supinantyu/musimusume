@@ -738,7 +738,7 @@ function areaRelics(areaId = currentArea().id) {
   return RELIC_DEFS.filter(r => r.area === areaId);
 }
 function relicIcon(def, stars) {
-  return `./assets/relics/${def.iconBase}_${stars}.png`;
+  return `./assets/relics/${def.iconBase}_${stars}.png?v=38`;
 }
 function relicDesc(def, stars, value) {
   if (def.id === "bark_jaw") return `${def.effectText} ${stars3(stars)}（防御-${value}）`;
